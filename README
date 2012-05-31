@@ -1,0 +1,159 @@
+ ________________________________________________________
+|                                                        |
+|                     [ iStreamdev ]                     |
+|________________________________________________________|
+
+ Written by:
+ Alib <aliboba@free.fr>
+ TheTroll <trolldev@gmail.com>
+
+ Website:
+ http://www.istreamdev.com
+
+ Project's homepage:
+ http://projects.vdr-developer.org/projects/show/istreamdev
+
+
+ Latest version available at:
+ http://projects.vdr-developer.org/projects/list_files/istreamdev
+
+ git repository:
+ git://projects.vdr-developer.org/istreamdev.git
+
+ See the file COPYING for license information.
+
+ About:
+ -----
+
+ iStreamdev lets you live stream your TV channels & recordings from VDR and all your Video & Music files to your iPhone.
+Your Iphone don't needs to be jailbroken, it uses native iphone Quicktime player.
+Your iPhone needs at least firmware 3.0 to support HTTP Live Streaming protocol.
+
+TV, recordings & video files are rencoded in mpeg2 TS stream with H264 video and mp3 audio.
+Audio files are streamed to their native formats. So only mp3, aac & wave are supported.
+
+ Features:
+ --------
+
+    * 100% webapp compatible user interface using jQtouch framework ( http://www.jqtouch.com/ )
+    * Full Ajax/Json client/server communication using JQuery ( jquery.com )
+    * Channel selection throught categories
+    * Channels listed with logo and current epg.
+    * Streaming format selection: Edge, 3g, Wifi
+    * Recording streaming: Access your vdr recordings with epg.
+    * Timers support: Add/Edit/Delete/Activate/Deactivate timers.
+    * Video files support: Stream to all your video files ( avi, mkv, mov, etc ) to your Iphone. If you have a movie.tbn poster.jpg or folder.jpg file in the same folder as the video file, it will display it as thumbnail. If there's no picture, it will generate a thumbnail from the video.
+    * Music files support: Stream all your mp3/aac/wav files with dynamic playlist support.
+    * Electronic Program Guide.
+
+ Webapp:
+ ------
+First time you use istreamdev, add it to your iPhone using Favorites menu & launch it in fullscreen mode as a normal Appstore app.
+
+ Usage:
+ -----
+
+Select a channels category, then a channel.
+Select your stream mode: Edge , 3g or Wifi. The Play icon
+will appear automatically after few seconds when the feed is
+ready.
+This is the same for recordings and videos files.
+To Stop the stream server, hit Stop stream button.
+
+Video thumbnails:
+iStreamdev takes videoname.tbn , poster.jpg or folder.jpg file ( from xbmc export library ) as thumbnail source, or grab a picture in the video stream if there's not.
+
+Channel logos:
+Put your 80x80 png logos in logos/ folder. They needs to have the same name/caps as your channels.conf If a channel have a / character in the name, replace it by _ ( cf RTL/TELEVISION > RTL_TELEVISION.png )
+
+Music:
+iStreamdev generate a playlist from the requested file to the last file of the folder. Then you can listen next track easily. To play an entire album, just launch the first track.
+
+ What you need:
+ -------------
+
+- an http server with PHP5 (PHP 5 >= 5.2.0)  enabled like apache or lighthttpd
+
+- for some php installation you need to install php5-json & php5-zlib extension.
+
+- ffmpeg compiled with libx264 and libmp3lame support
+
+- segmenter: http://svn.assembla.com/svn/legend/segmenter/ or use the provided one which includes a modification to avoid a warning related to an avformat function call
+
+_________________________________________________________
+                      INSTALL
+_________________________________________________________
+ 
+
+Download a stable release from Files or development revision from Git repository:
+
+	git clone git://projects.vdr-developer.org/istreamdev.git
+
+Copy the file in your webfolder. /istreamdev for example.
+Copy the config_default.php to config.php and edit it.
+
+Compiles segmenter by typing 'make' when in the segmenter folder and install it:
+"make & cp segmenter /usr/bin/"
+
+At each update, don't forget to remove your old config file and replace it by the new default one to prevent not updated config files.
+
+$httpath needs to point to your istreamdev http path ( /istreamdev/ if your site is http://mydomain/istreamdev/ ). Caution: don't use the full url path like http://.
+
+The ram folder and playlist one shoulds be writable.
+To prevent hard disk usage, you can mount it in /dev/shm to use ram instead of disk.
+If you don't have /dev/shm , you need to mount it on boot:
+On your /etc/mtab, add this line:
+
+	tmpfs /dev/shm tmpfs rw,nosuid,nodev 0 0
+
+From your istreamdev folder:
+
+	rm -Rf ram
+	mkdir /dev/shm/ram
+	ln -s /dev/shm/ram ram
+
+Check your files permissions. All php script and istream.sh should be executable by www-data user.
+www-data needs rights to launch ffmpeg, segmenter, and some shell commands.
+
+From your istreamdev directory:
+# set owner and group
+
+	sudo chown -R root.www-data ./*
+
+# strict default permissions for files and directories
+
+	sudo find ./ -type f | xargs sudo chmod 644
+	sudo find ./ -type d | xargs sudo chmod 755
+
+# ram and playlist directories need to be group-writable
+
+	sudo chmod 775 ram playlist
+
+# istream.sh shoudl be executable
+
+	sudo chmod 755 bin//istream.sh
+
+# if you moved the ram directory to a ramdisk as suggested:
+
+	sudo chown root.www-data /dev/shm/ram
+	sudo chmod 775 /dev/shm/ram
+
+Check everything is ok with ffmpeg by launching the above command logued as your http server user ( www-data ) :
+
+	./bin/istream.sh http://localhost:3000/TS/1 512k 128k 480x320 /istreamdev/ 3 /usr/bin/ffmpeg /usr/bin/segmenter session0
+
+You should see ffmpeg access streamdev http://localhost:3000/TS/1 and encode the stream.
+
+You can add your logos channels pictures ( 80x80 png ) in logos/ folder.
+If some channels have a / in the name, replace it by a space. Ex: "RTL\RTL Television" > "RTL RTL Television.png"
+
+Now everything is ok you can login from your iphone: http://yourip/istreamdev
+Add it to your Iphone home menu as shortcut ( IMPORTANT if you want to have it in fullscreen mode ).
+
+ACTIVATE DEBUG:
+--------------
+You can active debug logs in your config file:
+
+$debug=1; logs all events in a file.
+$ffmpegdebug=1; logs all ffmpeg output in a file.
+

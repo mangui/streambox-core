@@ -1,0 +1,368 @@
+div.loader {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	background-image: url(../img/loading.gif);
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	text-align: center;
+	vertical-align: middle;
+	height: 100%;
+	width: 100%;
+	z-index: 100;
+	left: 0;
+	opacity: .85;
+	display: block;
+	position: absolute;
+}
+
+#status_box {
+z-index: 102;
+background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ccc), to(#aaa), color-stop(.6,#CCCCCC));
+line-height: 16px;
+text-align: center;
+text-shadow: rgba(255,255,255,.8) 0 1px 0;
+color: #444;
+padding: 15px;
+border-top: 1px solid rgba(255,255,255,.2);
+display: block;
+position: fixed;
+left: 0;
+top: 0;
+width: 100%;
+font: bold 12px "Helvetica Neue", Helvetica;
+}
+
+ul li img.menuicon {
+vertical-align: middle;
+}
+
+h1 img.menuicon {
+position:relative;
+top: 3px;
+width: 22px;
+height: 20px;
+}
+
+.menuname {
+vertical-align: middle;
+margin: 0 0 0 10px;
+}
+
+li.forward > a > span, span.substring {
+vertical-align: middle;
+}
+li.channellist {
+height: 55px;
+background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4c4d4e), to(#404142));
+background-position: right center;
+background-repeat: no-repeat;
+}
+
+li.channellist img {
+width: 55px;
+height: 55px;
+vertical-align: middle;
+position: relative;
+-webkit-mask-box-image: url(../img/mask.png) 80 stretch;
+top: 0px;
+background-image: url('../img/nologoTV-mini.jpg') ;
+}
+
+li.channellist span.name {
+margin: 10px 0 0 0px;
+left: 90px;
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+max-width: 80%!important;
+white-space: nowrap;
+font-size: 17px;
+line-height: normal;
+position: absolute;
+font-weight: bold;
+width: 50%;
+
+}
+li.channellist span.comment {
+margin: 28px 0 0 0px;
+left: 90px;
+max-width: 80%!important;
+font-size: 14px;
+line-height: normal;
+position: absolute;
+top: 15 px;
+font-style: italic;
+font-weight: normal;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+width: 50%;
+
+}
+li.channellist small {
+margin-right: 0px;
+}
+
+li.channellist small.counter {
+    margin-right: 0px;
+	position: relative;
+	top: 40px;
+	font-size: 17px;
+    line-height: 13px;
+    font-weight: bold;
+    background: rgba(0,0,0,.15);
+    color: #fff;
+    -webkit-border-radius: 11px;
+    display: block;
+    width: auto;
+    -webkit-box-shadow: rgba(255,255,255,.1) 0 1px 0;
+}
+ul.thumb {
+-webkit-border-radius: 8px;
+-webkit-box-shadow: rgba(0,0,0,.3) 1px 1px 3px;
+}
+
+.thumbnail {
+vertical-align: middle;
+margin: 5px 0 5px 0;
+}
+
+span.streamButton a{
+margin: 5px 5px 5px 5px;
+border-width: 0 12px;
+padding: 8px;
+text-align: center;
+font-size: 14px;
+font-weight: bold;
+text-decoration: inherit;
+color: inherit;
+-webkit-border-image: url(../img/stream.png) 0 12 0 12;
+color: #FFFFFF;
+}
+span.streamButton a:active{
+color: #aaa;
+-webkit-border-image: url(../img/stream_clicked.png) 0 12 0 12;
+}
+span.recButton a{
+margin: 5px 5px 5px 5px;
+border-width: 0 12px;
+padding: 8px;
+text-align: center;
+font-size: 14px;
+font-weight: bold;
+text-decoration: inherit;
+color: inherit;
+-webkit-border-image: url(../img/rec.png) 0 12 0 12;
+color: #FFFFFF;
+}
+span.recButton a:active{
+color: #aaa;
+-webkit-border-image: url(../img/rec_clicked.png) 0 12 0 12;
+}
+
+ul.streaminfo {
+-webkit-border-radius: 8px;
+-webkit-box-shadow: rgba(0,0,0,.3) 1px 1px 3px;
+}
+ul.streaminfo li:first-child, ul.streaminfo li:first-child a {
+    border-top: 0;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+}
+ul.streaminfo li:last-child, ul.streaminfo li:last-child a {
+    -webkit-border-bottom-left-radius: 8px;
+    -webkit-border-bottom-right-radius: 8px;
+}
+
+ul.streaminfo span.name_now, span.name_next {
+padding-top: 0px;
+padding-right: 10px;
+padding-left: 10px;
+font-size: 17px;
+font-weight: bold;
+display: block;
+color: white;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+ul.streaminfo span.epgtime_now, span.epgtime_next {
+padding-top: 0px;
+padding-right: 10px;
+padding-left: 10px;
+font-size: 14px;
+font-weight: bold;
+display: block;
+color: #ccc;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+ul.streaminfo span.desc_now {
+position: relative;
+padding-top: 5px;
+padding-right: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+display: block;
+color: white;
+font-size: 14px;
+font-style: italic;
+font-weight: normal;
+line-height: normal;
+
+}
+
+ul.streamstatus {
+-webkit-border-radius: 8px;
+-webkit-box-shadow: rgba(0,0,0,.3) 1px 1px 3px;
+}
+ul.streamstatus span.title {
+padding-top: 10px;
+padding-right: 10px;
+padding-left: 10px;
+font-size: 17px;
+font-weight: bold;
+display: block;
+color: white;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+
+ul.streamstatus span.mode {
+position: relative;
+padding-top: 10px;
+padding-right: 10px;
+padding-bottom: 10px;
+padding-left: 10px;
+display: block;
+color: white;
+font-size: 14px;
+font-style: italic;
+font-weight: normal;
+line-height: normal;
+}
+#jqt ul li select option{
+color: #000000;
+}
+#jqt ul li select optgroup{
+color: #999;
+}
+span.timertitle {
+padding-right: 10px;
+padding-left: 10px;
+font-size: 14px;
+font-weight: bold;
+color: #999;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+span.menutitle {
+padding-right: 10px;
+padding-left: 10px;
+font-size: 17px;
+font-weight: bold;
+color: #999;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+.formerrormsg {
+padding-right: 10px;
+padding-left: 10px;
+font-size: 12px;
+color: #FF8300;
+
+}
+
+a.cat_but {
+
+}
+
+video {
+padding-top:5px;
+}
+li.track small.counter {
+margin-right: 15px;
+position: relative;
+top: -2px;
+font-size: 17px;
+line-height: 13px;
+font-weight: bold;
+background: rgba(0,0,0,.15);
+color: #fff;
+-webkit-border-radius: 11px;
+display: block;
+width: auto;
+-webkit-box-shadow: rgba(255,255,255,.1) 0 1px 0;
+}
+li.track {
+height: 20px;
+padding: 0;
+}
+
+li.track a .numberbox {
+position: relative;
+width: 23px;
+height: 42px;
+top: -12px;
+display: block;
+float: left;
+margin-right: 3px;
+border-right: 1px solid #333333;
+-webkit-box-shadow: rgba(255,255,255,.1) 0 1px 0;
+}
+li.track a .number {
+position: absolute;
+color: #9c9ea0;
+top: 10px;
+left: 2px;
+}
+li.track a span.tracktitle {
+position: relative;
+left: 0px;
+padding-left: 4px;
+top: -3px;
+display:block; 
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+width: 70%;
+}
+li.track a div.timebox {
+position: relative;
+width: 30px;
+height: 42px;
+top: -36px;
+display: block;
+float: right;
+margin-left: 3px;
+border-left: 1px solid #333333;
+-webkit-box-shadow: rgba(255,255,255,.1) 0 1px 0;
+}
+li.track a .time {
+position: absolute;
+color: #9c9ea0;
+top: 12px;
+left: 5px;
+font-size: 14px;
+}
+
+.whitetitle {
+color: #fff;
+}
+ul.edgetoedge span.epgname {
+padding-top: 0px;
+padding-right: 10px;
+padding-left: 10px;
+font-size: 14px;
+font-weight: bold;
+display: block;
+color: white;
+text-overflow: ellipsis;
+overflow: hidden;
+white-space: nowrap;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}
+ul.edgetoedge span.epgtime {
+padding-top: 0px;
+padding-right: 10px;
+padding-left: 10px;
+font-size: 12px;
+font-weight: bold;
+display: block;
+color: #ccc;
+text-shadow: rgba(0,0,0,.8) 0 1px 0;
+}

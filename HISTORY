@@ -1,0 +1,133 @@
+iStreamdev History
+------------------
+xx.xx.xxx - dev
+
+- fix problem with long path for ffmpeg & segmenter binaries ( thx Mattes )
+- added some fix for ipad & ios4
+- fixed some path & filename bug with special characters for music.
+- removed AT dependency
+
+02.04.2010 - 1.0.1
+
+- Added fix for PHP version < 5.2.0
+- added php module check and dynamic loading if possible.
+- some client speedups and optimisations
+- removed custom segmenter code, no need for a modified version anymore
+- now store segmenter and ffmeg pids to kill them
+
+03.29.2010 - 1.0.0
+
+- Massive rework from scratch
+- Now based on JQuery/JQTouch
+- Fully Ajax/Json based. Server only send Json data to client.
+- Client fully webapp compatible. All the client is loaded in the same html page.
+- New skin with animated transitions. Hardware accelerated animations.
+- Added recording from Channel info.
+- Encoding status message is now updated live.
+- Added new status "Encoding finished" for recording and videos files. It appears without "*" character before the name in Home sessions menu too.
+- Added Electronic Program Guide with add timer feature.
+- Dynamic minimise and compression of the css & js files. Now cached.
+- gzip compression of all json data
+
+
+01.03.2010 - 0.3.7
+
+- fixed indentation
+- good display of recording date & time and names
+- epg characters encoding detection and conversion to utf8 if necessary
+- fixed channels with coma. Something was still missing.
+- added an option to enable/disable the VDR feature
+- segmenter binary path is now configurable ( don't forget to update your config.php )
+- cosmetics fixes
+- added timers support: create/edit/delete.
+- now support moviename.tbn, poster.jpg & folder.jpg thumbnails for movies
+- added sources support for multiple media dirs.
+- added mp3,aac,wav playback support.
+- added switch auto to next track while playing audio files.
+- added audio dir playback with itune style
+- replaced mediainfo by getid3 (http://getid3.sourceforge.net/)
+- trick channel names having a \ for logos. Replace the \ by a _ in the logo name. ex CHAN\CHAN gives CHAN_CHAN.png.
+- fixed Thumbnails aspect/ratio. Now it checks sources resolution before generating the thumb.
+- Added more info for video.
+- no more killall ffmpeg command. Now the pid is checked and killed.
+- allow multiple streaming sessions
+- added button to kill all active sessions.
+
+19.02.2010 - V.0.3.6.1
+
+- fixed CSS typo
+- cosmetic changes in path
+- corrected media listing if directory is empty
+
+19.02.2010 - V.0.3.6
+
+- Added Media streaming. Only video files for the moment. Mediainfo is needed on the system. ( The Troll )
+- fix logos channels size in channel list. Now it's ok ( thanks alex )
+- now recordings show logo channel ( The Troll )
+- fix channels with comma in the name to display epg ( thanks hendrikw01 & Mentox )
+- default config moved to config-default.php
+
+
+18.02.2010 - V.0.3.5
+
+- fix SHELL environment necessary for apache account when login shell is /sbin/nologin (cf. cron manual) ( thanks alex )
+- fix logos channels oversized in channels list ( thanks alex )
+- fix memory buffer issue in svdrp php implementation causing timeout ( thanks hendrikw01 )
+- backend rework to ease future evolutions ( TheTroll )
+-  No more 'ps aux | grep segmenter' calls to check if server is running, and less svdrp call.  Now a status file is present in ram folder while broadcast is running. ( TheTroll )
+
+17.02.2010 - V.0.3.4
+
+- changed apps icon, boot picture and menu pics.
+- now handles old vdr recordings ( PES )
+- mono or stereo sound now configurable in config.php
+- less bugs with special characters in path & names
+
+15.02.2010 - V.0.3.3
+
+- added support for VDR recordings (recordings in sub folders are supported)
+- fixed channels with ' char
+- better handling of stream availibility. Now based on first ts file ready and not m3u8 playlist. Should always works now.
+- changed stream timeout to 25 seconds in case of vdr can't tune to the channel.
+- no more svdrpsend.pl dependency. Now svdrp request are made with svdrpphp lib.
+
+
+15.02.2010 - V.0.3.2
+
+- fixed problem with some channels name with a "," in the name
+- added default background for channels without logos.
+
+
+15.02.2010 - V.0.3.1
+
+- fixed error in README for testing istream.sh
+- added Ajax based server callback for stream availibility. Now if after 15 seconds VDR still send nothing, it redirect to an error page. When stream is available, the play icon appear based on ajax server push.
+
+
+14.02.2010 - v.0.3.0
+
+- Massive rewrite & optimisations.
+- added Category page
+- added Channel list per Category with channels logo & epg
+- adapted in php many shell call.
+- configuration from config.php file only
+- encoding bitrate and resolution configurable
+- solved many race conditions with simultaneous users.
+- channel list now parsed from channels.conf and not streamdev version dependant anymore
+- better video quality for low bitrates
+- menu icons
+- remove loading.ts temporary video.
+- now the video play button appear only when the video feed is ready, no need of the loading trick anymore.
+
+
+09.02.2010 - v. 0.2
+
+- Initial revision
+
+
+To do:
+
+ - Access to vdr recordings
+ - Access to stored media ( xvid, mp3, etc )
+
+
