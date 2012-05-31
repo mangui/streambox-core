@@ -16,4 +16,22 @@ function addlog($log)
 	fclose($debughandle);
 }
 
+function addstreaminglog($log)
+{
+        global $debug, $debugfile, $monitoring, $monitoringfile;
+
+	if (!$monitoring)
+		return;
+
+        $newlog = date("Y/m/d H:i:s -> ") .$log ."\n";
+
+        $debughandle = fopen($monitoringfile, 'a');
+        if (!$debughandle)
+                return;
+        fwrite($debughandle, $newlog);
+
+        fclose($debughandle);
+}
+
+
 ?>

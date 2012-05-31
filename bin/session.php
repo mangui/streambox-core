@@ -15,7 +15,8 @@ function sessioncreate($type, $url, $mode)
 	if ($nbencprocess >= $maxencodingprocesses)
 	{
 		addlog("Error: Cannot create sesssion, too much sessions already encoding");
-		return "";
+		addstreaminglog("iStreamdev: cannot create sesssion, too much sessions already encoding");
+		return "session: Cannot create sesssion, too much sessions already encoding";
 	}
 
 	// Get a free session
@@ -30,7 +31,8 @@ function sessioncreate($type, $url, $mode)
 	if ($i == 1000)
 	{
 		addlog("Error: Cannot find a new session name");
-		return "";
+		addstreaminglog("iStreamdev: cannot find a new session name");
+		return "session: Cannot find a new session name";
 	}
 
 	// Default
@@ -82,10 +84,10 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "./istream.sh \"" .$url ."\" " .$qparams ." " .$httppath ." 2 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "./istream.sh \"" .$url ."\" " .$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
 			break;
 		case 'rec':
-			$cmd = "./istream.sh - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."/0* \" >/dev/null 2>&1 &";
+			$cmd = "./istream.sh - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."\" >/dev/null 2>&1 &";
 			break;
 		case 'vid':
 			$cmd = "./istream.sh \"" .$url ."\" " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
@@ -222,22 +224,17 @@ function getstreamingstatus($session)
 	$path = '../ram/' .$session;
 
 	// Check that session exists
-	if (!count(glob($path)))
+	if (substr($session, 7, 1) == ":")
 	{
 		$status['status'] = "error";
-
-	        $nbencprocess = exec("find ../ram/ -name segmenter.pid | wc | awk '{ print $1 }'");
-	        if ($nbencprocess >= $maxencodingprocesses)
-			$status['message'] = "<b>Error: too much sessions</b>";
-	        else
-			$status['message'] = "<b>Error: could not create session folder</b>";
+		$status['message'] = "<b>Error:" .substr($session,5) ."</b>";
 	}
 	else
 	{
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-		if (count(glob($path . '/*.ts')) < 2)
+		if (count(glob($path . '/*.ts')) < 3)
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
@@ -272,7 +269,7 @@ function getstreamingstatus($session)
 			if (is_pid_running($path .'/segmenter.pid'))
 			{
 				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob($path . '/*.ts')) ."/2)</i>";
+				$status['message'] .= count(glob($path . '/*.ts')) ."/3)</i>";
 			}
 			else
 				$status['message'] .= "<i>stopped</i>";
@@ -345,7 +342,7 @@ function sessiongetstatus($session, $prevmsg)
 			if (is_pid_running('../ram/' .$session .'/segmenter.pid'))
 			{
 				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob('../ram/' .$session .'/*.ts')) ."/2)</i>";
+				$status['message'] .= count(glob('../ram/' .$session .'/*.ts')) ."/3)</i>";
 			}
 			else
 				$status['message'] .= "<i>stopped</i>";

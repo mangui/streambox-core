@@ -9,10 +9,11 @@
 	$debugfile="/tmp/istreamdev.log"; // Debug file
 	$ffmpegdebug=0;			// Debug ffmpeg
 	$ffmpegdebugfile="/tmp/istreamdev-ffmpeg.log"; // FFmpeg debug file
+	$monitoring=0;
+	$monitoringfile="/tmp/istreamdev-monitoring.log"; // Monitor all streaming requests
 
 	// Http configuration
-	$user='istreamdev';		// Login
-	$pass='iguest';			// Password
+	$userlist= array ('user1' => 'pass1', 'user2' => 'pass2');
 	$httppath='/istreamdev/';	// Absolute path to the index.php file. Don't put http://yourdomain !!
 
 	// VDR configuration
