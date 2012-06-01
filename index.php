@@ -1,11 +1,17 @@
 <?php
+/*ini_set('display_errors', 'On');
+error_reporting(E_ALL);*/
+
 if (file_exists('config.php'))
         include ('config.php');
 else
         include ('config_default.php');
+include ('bin/debug.php');
+include ('bin/sql.php');
 include ('bin/auth.php');
 if(!ob_start("ob_gzhandler"))
 ob_start();
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

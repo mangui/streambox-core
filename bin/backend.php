@@ -20,6 +20,7 @@ if (file_exists('../config.php'))
 else
 	include ('../config_default.php');
 include ('./debug.php');
+include ('./sql.php');
 include ('./auth.php');
 include ('../getid3/getid3.php');
 include ('./utils.php');

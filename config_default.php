@@ -13,8 +13,13 @@
 	$monitoringfile="/tmp/istreamdev-monitoring.log"; // Monitor all streaming requests
 
 	// Http configuration
-	$userlist= array ('user1' => 'pass1', 'user2' => 'pass2');
 	$httppath='/istreamdev/';	// Absolute path to the index.php file. Don't put http://yourdomain !!
+
+	// SQL database
+	$sqlserver="127.0.0.1";		// SQL server IP
+	$sqluser="user";		// SQL user
+	$sqlpassword="password";	// SQL password
+	$sqldatabase="streambox";	// SQL database name
 
 	// VDR configuration
 	$vdrchannels='/etc/vdr/channels.conf';			// VDR channel list
