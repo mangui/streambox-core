@@ -1,12 +1,12 @@
 <?php
 function addlog($log)
 {
-	global $debug, $debugfile;
+	global $debug, $debugfile, $username;
 
 	if (!$debug)
 		return ;
 
-	$newlog = date("[Y/m/d H:i:s]  ") .$log ."\n";
+	$newlog = date("[Y/m/d H:i:s]  ") ."<" .$username ."> " .$log ."\n";
 
 	$debughandle = fopen($debugfile, 'a');
 	if (!$debughandle)

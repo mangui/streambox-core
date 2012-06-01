@@ -13,7 +13,7 @@ function writeinfostream($session, $type, $mode, $url, $channame)
 {
 	addlog("Writting stream info from session " .$session ." (type=" .$type .", mode=" .$mode .", url=" .$url .", channame=" .$channame .")");
 
-	$ram = "../ram/" .$session ."/";
+	$ram = "../ram/sessions/" .$session ."/";
 
 	$infofile = @fopen($ram ."streaminfo", 'w');
 	if (!$infofile)
@@ -30,7 +30,7 @@ function writeinfostream($session, $type, $mode, $url, $channame)
 
 function readinfostream($session)
 {
-	$ram = "../ram/" .$session ."/";
+	$ram = "../ram/sessions/" .$session ."/";
 
 	if (!file_exists($ram ."streaminfo"))
 		return array("none");

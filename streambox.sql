@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client: localhost
--- Généré le: Ven 01 Juin 2012 à 11:31
+-- Généré le: Ven 01 Juin 2012 à 15:11
 -- Version du serveur: 5.1.61
 -- Version de PHP: 5.4.0-3
 
@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`username`, `password`, `email`, `date_added`, `rights`) VALUES
-('username', 'password', 'email@email.com', '31/05/12', 100);
+('user1', 'user1', 'user1@email.com', '31/05/12', 100),
+('user2', 'user2', 'user2@email.com', '01/06/12', 5);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

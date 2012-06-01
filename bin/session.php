@@ -1,8 +1,8 @@
 <?php
-
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile;
+	global $username;
 
 	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
 
@@ -10,8 +10,47 @@ function sessioncreate($type, $url, $mode)
 	if (!isurlvalid($url, $type))
 		return "";
 
+        // Extract $channame if possible
+        switch ($type)
+        {
+                case 'tv':
+                        $urlarray = explode("/", $url);
+                        $channum = $urlarray[count($urlarray)-1]; 
+                        $channame = vdrgetchanname($channum);
+                        break;
+                case 'rec':
+                        list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
+                        break;
+                default:
+                        $channame = "";
+                        break;
+        }
+
+	// Trying to reuse an existing session
+	$dir_handle = @opendir('../ram/sessions/');
+	if ($dir_handle)
+	{
+		while ($session = readdir($dir_handle))
+		{
+                        if($session == "." || $session == ".." || $session == 'lost+found')
+                                continue;
+
+                        if (!is_dir('../ram/sessions/' .$session))
+                                continue;
+
+                        // Get info
+                        list($rtype, $rmode, $rurl, $rchanname) = readinfostream($session);
+			if (($type == $rtype) && ($mode == $rmode) && ($channame == $rchanname))
+			{
+				addlog("Reusing existing session: " .$session);
+				goto create_link;
+			}
+		}
+	}
+
+
 	// Check that the max number of session is not reached yet
-	$nbencprocess = exec("find ../ram/ -name segmenter.pid | wc | awk '{ print $1 }'");
+	$nbencprocess = exec("find ../ram/sessions/ -name segmenter.pid | wc | awk '{ print $1 }'");
 	if ($nbencprocess >= $maxencodingprocesses)
 	{
 		addlog("Error: Cannot create sesssion, too much sessions already encoding");
@@ -24,7 +63,7 @@ function sessioncreate($type, $url, $mode)
 	for ($i=0; $i<1000; $i++)
 	{
 		$session = "session" .$i;
-		if (!file_exists('../ram/' .$session))
+		if (!file_exists('../ram/sessions/' .$session))
 			break;
 	}
 
@@ -49,29 +88,14 @@ function sessioncreate($type, $url, $mode)
 	}
 
 	// Create session
-	addlog("Creating new session dir ram/" .$session);
-	exec('mkdir ../ram/' .$session);
-	// Extract $channame if needed
-        switch ($type)
-        {
-                case 'tv':
-                        $urlarray = explode("/", $url);
-                        $channum = $urlarray[count($urlarray)-1];
-                        $channame = vdrgetchanname($channum);
-                        break;
-                case 'rec':
-                        list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
-                        break;
-                default:
-                        $channame = "";
-                        break;
-        }
+	addlog("Creating new session dir ram/sessions/" .$session);
+	exec('mkdir ../ram/sessions/' .$session);
 
 	// Create logo
         if ($type == 'vid')
-                generatelogo($type, $url, '../ram/' .$session .'/thumb.png');
+                generatelogo($type, $url, '../ram/sessions/' .$session .'/thumb.png');
         else
-                generatelogo($type, $channame, '../ram/' .$session .'/thumb.png');
+                generatelogo($type, $channame, '../ram/sessions/' .$session .'/thumb.png');
 
 	// FFMPEG debug
 	if ($ffmpegdebug)
@@ -107,16 +131,22 @@ function sessioncreate($type, $url, $mode)
 	// Write streaminfo
 	writeinfostream($session, $type, $mode, $url, $channame);
 
+create_link:
+	// Create link
+	exec ('ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
+
 	return $session;
 }
 
 function sessiondelete($session)
 {
+	global $username;
+
 	$ret = array();
-	
+
 	if ($session == 'all')
 	{
-		$dir_handle = @opendir('../ram/');
+		$dir_handle = @opendir('../ram/' .$username);
 		if ($dir_handle)
 		{
 			while ($session = readdir($dir_handle))
@@ -124,7 +154,7 @@ function sessiondelete($session)
 				if($session == "." || $session == ".." || $session == 'lost+found')
 					continue;
 
-				if (!is_dir('../ram/' .$session))
+				if (!is_dir('../ram/sessions/' .$session))
 					continue;
 
 				// Get info
@@ -161,7 +191,7 @@ function sessiongetinfo($session)
 
 	// Get info
 	$getid3 = new getID3;
-	$fileinfo = $getid3->analyze('../ram/' .$session .'/thumb.png');
+	$fileinfo = $getid3->analyze('../ram/sessions/' .$session .'/thumb.png');
 	$info['thumbwidth'] = $fileinfo['video']['resolution_x'];
 	$info['thumbheight'] = $fileinfo['video']['resolution_y']; 
 
@@ -196,9 +226,22 @@ function sessiongetinfo($session)
 
 function sessiondeletesingle($session)
 {
+	global $username;
+
 	addlog("Deleting session " .$session);
 
-	$ram = "../ram/" .$session ."/";
+	// Remove link
+	exec("rm ../ram/" .$username ."/" .$session);
+
+	// Check if the session is still used
+	exec('find ../ram/ -name "' .$session .'" | grep -v sessions', $output);
+        if(count($output) > 0)
+        {
+                addlog("Session " .$session ." in use by another user");
+                return;
+        }
+
+	$ram = "../ram/sessions/" .$session ."/";
 	$cmd = "";
 
 	// First kill ffmpeg
@@ -221,7 +264,7 @@ function getstreamingstatus($session)
 
 	$status = array();
 
-	$path = '../ram/' .$session;
+	$path = '../ram/sessions/' .$session;
 
 	// Check that session exists
 	if (substr($session, 7, 1) == ":")
@@ -234,7 +277,7 @@ function getstreamingstatus($session)
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-		if (count(glob($path . '/*.ts')) < 3)
+		if (count(glob($path . '/*.ts')) < 3) /* */
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
@@ -269,7 +312,7 @@ function getstreamingstatus($session)
 			if (is_pid_running($path .'/segmenter.pid'))
 			{
 				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob($path . '/*.ts')) ."/3)</i>";
+				$status['message'] .= count(glob($path . '/*.ts')) ."/3)</i>"; /**/
 			}
 			else
 				$status['message'] .= "<i>stopped</i>";
@@ -287,7 +330,7 @@ function getstreamingstatus($session)
 			else
 				$status['message'] .= "<i>fully encoded</i>";
 
-			$status['url'] = $httppath ."ram/" .$session ."/stream.m3u8";
+			$status['url'] = $httppath ."ram/sessions/" .$session ."/stream.m3u8";
 
 		}
 	}
@@ -299,7 +342,7 @@ function sessiongetstatus($session, $prevmsg)
 {
 	$time = time();
 
-	// Check if we need to timeout on the sesssion creation */
+	// Check if we need to timeout on the sesssion creation
 	$checkstart = preg_match("/requesting/", $prevmsg);
 	
 	while((time() - $time) < 29)
@@ -328,21 +371,20 @@ function sessiongetstatus($session, $prevmsg)
 			$status['status'] = "error";
 			$status['message'] = "Error: session could not start";
 
-                        
 			$status['message'] .= "<br>";
-                        
+
 			$status['message'] .= "<br>  * FFmpeg: ";
 
-			if (is_pid_running('../ram/' .$session .'/ffmpeg.pid'))
+			if (is_pid_running('../ram/sessions/' .$session .'/ffmpeg.pid'))
 				$status['message'] .= "<i>running</i>";
 			else
 				$status['message'] .= "<i>stopped</i>";
 			$status['message'] .= "<br>  * Segmenter: ";
-                        
-			if (is_pid_running('../ram/' .$session .'/segmenter.pid'))
+
+			if (is_pid_running('../ram/sessions/' .$session .'/segmenter.pid'))
 			{
 				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob('../ram/' .$session .'/*.ts')) ."/3)</i>";
+				$status['message'] .= count(glob('../ram/sessions/' .$session .'/*.ts')) ."/3)</i>";
 			}
 			else
 				$status['message'] .= "<i>stopped</i>";
@@ -364,11 +406,13 @@ function sessiongetstatus($session, $prevmsg)
 
 function sessiongetlist()
 {
+	global $username;
+
 	$sessions = array();
 
-	addlog("Listing sessions");
+	addlog("Listing sessions for " .$username);
 
-	$dir_handle = @opendir('../ram/');
+	$dir_handle = @opendir('../ram/' .$username .'/');
 	if ($dir_handle)
 	{
 		while ($session = readdir($dir_handle))
@@ -376,7 +420,7 @@ function sessiongetlist()
 			if($session == "." || $session == ".." || $session == 'lost+found')
 				continue;
 
-			if (!is_dir('../ram/' .$session))
+			if (!is_dir('../ram/' .$username .'/' .$session))
 				continue;
 
 			// Get info
@@ -399,12 +443,13 @@ function sessiongetlist()
 				$newsession['name'] = "Error: " .$newsession['name'];
 
 			// Check if encoding
-			if (is_pid_running('../ram/' .$session .'/segmenter.pid') && ($status['status'] != "error"))
+			if (is_pid_running('../ram/sessions/' .$session .'/segmenter.pid') && ($status['status'] != "error"))
 				$newsession['encoding'] = 1;
 			else
 				$newsession['encoding'] = 0;
 
 			$sessions[] = $newsession;
+
 		}
 	}
 
@@ -431,9 +476,9 @@ function streammusic($path, $file)
 
 	// Get listing
 	$filelisting = filesgetlisting($path);
-	
+
 	$addfiles = 0;
-	
+
 	foreach ($filelisting as $f)
 	{
 		if ($f['type'] != 'audio')

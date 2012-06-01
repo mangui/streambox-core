@@ -4,7 +4,7 @@ STREAM=$1
 VRATE=$2
 ARATE=$3
 XY=$4
-HTTP_PATH="$5ram/"
+HTTP_PATH="$5ram/sessions/"
 
 SEGDUR=10		# Length of Segments produced (between 10 and 30)
 SEGWIN=$6		# Amount of Segments to produce 
@@ -35,12 +35,12 @@ fi
 ##############################################################
 
 # Check that the session dir exists
-if [ ! -e ../ram/$SESSION ]
+if [ ! -e ../ram/sessions/$SESSION ]
 then
 	exit;
 fi
 
-cd ../ram/$SESSION
+cd ../ram/sessions/$SESSION
 
 # Create a fifo
 mkfifo ./fifo
