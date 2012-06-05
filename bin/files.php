@@ -60,7 +60,7 @@ function mediagentb($stream, $dest)
 		$getid3 = new getID3;
 		$fileinfo = $getid3->analyze($file);
 	}
-	
+
 	if ($fileinfo['video']['resolution_y'] && $fileinfo['video']['resolution_x'])
 	{
 		if ($fileinfo['video']['resolution_y'] < $fileinfo['video']['resolution_x'])
@@ -90,7 +90,7 @@ function mediagentb($stream, $dest)
 
 function filegettype($file)
 {
-	global $videotypes, $audiotypes;
+	global $videotypes, $audiotypes, $vdrrecpath;
 
 	// Get file extension
 	$fileext = end(explode(".", $file));
@@ -98,8 +98,8 @@ function filegettype($file)
 
 	if (is_dir($file))
 	{
-		if ($fileext == "rec")
-			return "rec";
+		if (substr($file, 0, strlen($vdrrecpath)) == $vdrrecpath)
+			return 'rec';
 		else
 			return 'folder';
 	}
@@ -174,6 +174,8 @@ function generatelogo($type, $name, $dest)
 
 function filesgetlisting($dir)
 {
+	global $username;
+
 	addlog("Listing dir: " .$dir);
 
 	$filelisting = array();
@@ -204,13 +206,12 @@ function filesgetlisting($dir)
 
 	// Alphabetical sorting
 	sort($medianame_array);
-	
+
 	$number = 1;
-	
+
 	// List files and folders
 	foreach($medianame_array as $value)
 	{
-
 		$type = filegettype($dir ."/" .$value);
 
 		$newentry = array();
@@ -236,10 +237,21 @@ function filesgetlisting($dir)
 					$folderlisting[] = $newentry;
 				break;
 			case 'rec':
-				$date = preg_replace('/-/', '/', substr($value, 0, 10));
-				$time = preg_replace('/\./', 'h', substr($value, 11, 5));
-				$recnice = $date .' at ' .$time;
-				$newentry['name'] = $recnice;
+				if (end(explode(".", $file)) == "rec")
+				{
+					$date = preg_replace('/-/', '/', substr($value, 0, 10));
+					$time = preg_replace('/\./', 'h', substr($value, 11, 5));
+					$recnice = $date .' at ' .$time;
+					$newentry['name'] = $recnice;
+				}
+				else
+				{
+					if ( (substr($value, 0, strlen($username)+1)) != ("$username" ."_") )
+						continue;
+					$newentry['name'] = $value;
+					$newentry['type'] = 'folder';
+				}
+
 				$folderlisting[] = $newentry;
 				break;
 			default:

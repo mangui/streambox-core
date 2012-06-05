@@ -517,7 +517,7 @@ function vdrgetrecinfo($rec)
 
 	$epgtitle="";
 	$epgdesc="";
-	
+
 	// For all epg
 	$count = count($allepg);
 	for ($i = 0; $i < $count; $i++)
@@ -542,7 +542,7 @@ function vdrgetrecinfo($rec)
 		}
 
 	}
-	
+
 	// Convert if needed
 	if (!is_utf8($epgtitle))
 		$epgtitle = utf8_encode($epgtitle);
@@ -554,6 +554,8 @@ function vdrgetrecinfo($rec)
 
 function vdrlisttimers()
 {
+	global $username;
+
 	addlog("VDR: vdrlisttimers()");
 
 	$timerslist = array();
@@ -591,6 +593,11 @@ function vdrlisttimers()
 		$newtimer['endtime'] = $timerarray[4];
 		$newtimer['running'] = ($typearray[1] & 0x8)?1:0;
 
+		if ( (substr($newtimer['name'], 0, strlen($username)+1)) != "$username" ."_" )
+			continue;
+		else
+			$newtimer['name'] = substr($newtimer['name'], strlen($username)+1);
+
 		$timerslist[] = $newtimer;
 	}
 
@@ -621,12 +628,17 @@ function vdrdeltimer($timer)
 
 function vdrsettimer($prevtimer, $channum, $date, $stime, $etime, $desc, $active)
 {
+	global $username;
+
 	addlog("VDR: vdrsettimer(prevtimer=" .$prevtimer .", channum=" .$channum .", date=" .$date .", stime=" .$stime .", etime=" .$etime .", desc=" .$desc .", active=" .$active .")");
 
 	$ret = array();
 
 	// Convert date to VDR format
 	$date = preg_replace("$/$", "-", $date);
+
+	// Add user name
+	$desc = $username ."_" .$desc;
 
 	if ($prevtimer == "")
 		$command = "NEWT " .$active .":" .$channum .":" .$date .":" .$stime .":" .$etime .":99:99:" .$desc;
