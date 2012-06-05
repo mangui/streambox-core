@@ -19,7 +19,7 @@ function vdrsendcommand($cmd)
 
 function vdrgetcategories()
 {
-	global $vdrchannels;
+	global $vdrchannels, $username;
 
 	addlog("VDR: vdrgetcategories()");
 
@@ -39,6 +39,8 @@ function vdrgetcategories()
 		print "Unable to open channels file";
 		return $catlist;
 	}
+
+	$rights = sqlgetuserinfo("rights", $username);
 
 	$curcat = "";
 	$curcatchancount = 0;
@@ -65,6 +67,13 @@ function vdrgetcategories()
 			{
 				$catarray = explode(' ', $curcat);
 				$curcat = substr($curcat, strlen($catarray[0])+1);
+			}
+
+			// Check rights
+			if (strstr($curcat, $rights) == "")
+			{
+				$curcat="";
+				continue;
 			}
 
 			if (!is_utf8($curcat))
@@ -262,7 +271,7 @@ function vdrgetchancat($channame)
 
 			continue;
 		}
-		
+
 		$name = explode(":", $line);
 		$name = explode(";", $name[0]);
 		if ($name[0] == $channame)
