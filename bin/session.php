@@ -246,11 +246,11 @@ function sessiondeletesingle($session)
 
 	// First kill ffmpeg
 	if (is_pid_running($ram ."ffmpeg.pid"))
-		$cmd .= " kill `cat " .$ram ."ffmpeg.pid`; rm " .$ram ."ffmpeg.pid; ";
+		$cmd .= " kill -9 `cat " .$ram ."ffmpeg.pid`; rm " .$ram ."ffmpeg.pid; ";
 
 	// Then kill segmenter
 	if (is_pid_running($ram ."segmenter.pid"))
-		$cmd .= " kill `cat " .$ram ."segmenter.pid`; rm " .$ram ."segmenter.pid; ";
+		$cmd .= " kill -9 `cat " .$ram ."segmenter.pid`; rm " .$ram ."segmenter.pid; ";
 
 	addlog("Sending session kill command: " .$cmd);
 
