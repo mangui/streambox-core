@@ -18,7 +18,7 @@ ob_start();
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="UTF-8" />
-        <title>iStreamdev</title>
+        <title>streambox</title>
         <link rel="stylesheet" href="min/?b=css&f=jqtouch.css,theme.css,istreamdev.css,spinningwheel.css" type="text/css" media="screen" />
         <script src="min/?b=js&f=jquery-1.4.2.min.js,jqtouch.js,jqtouch.transitions.js,functions.js,spinningwheel.js,jquery.scrollTo-1.4.2.js,istreamdev.js" type="text/javascript" charset="utf-8"></script>
 	</head>
