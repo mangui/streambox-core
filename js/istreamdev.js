@@ -456,7 +456,7 @@ function gen_streamchannel(channame,channumber) {
 	stream_channel = $('#streamchannel');
 	stream_channel.find('h1').html( '<img class="menuicon" src="img/tv.png" /> ' +channame);
 	stream_channel.find('#thumbnail').attr('src','logos/' + channame + ".png");
-	var dataString = "action=getChanInfo&chan=" + channumber;
+	var dataString = "action=getChanInfo&chan=" + channame;
 	//Json call to get tv program info
 	$.getJSON("bin/backend.php",
 			dataString,
@@ -467,7 +467,7 @@ function gen_streamchannel(channame,channumber) {
 			stream_channel.find('span[class="desc_now"]').html( program.now_desc );
 			stream_channel.find('span[class="name_next"]').html( 'Next: ' + program.next_title );
 			stream_channel.find('span[class="epgtime_next"]').html( program.next_time );
-			stream_channel.find('span[rel="url"]').html(streamdev_server + channumber);
+			stream_channel.find('span[rel="url"]').html(streamdev_server + channame);
             stream_channel.find('span[rel="type"]').html('tv');
 			stream_channel.find('span[rel="number"]').html(channumber);
 			stream_channel.find('span[rel="channame"]').html(channame);

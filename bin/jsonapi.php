@@ -65,11 +65,11 @@ function getTvChan($cat)
 	return json_encode($ret);
 }
 
-function getChanInfo($channum)
+function getChanInfo($channame)
 {
 	$ret = array();
 	
-	$ret['program'] = vdrgetchaninfo($channum);
+	$ret['program'] = vdrgetchaninfo($channame);
 
 	return json_encode($ret);
 }
