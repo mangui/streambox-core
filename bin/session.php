@@ -14,9 +14,8 @@ function sessioncreate($type, $url, $mode)
         switch ($type)
         {
                 case 'tv':
-                        $urlarray = explode("/", $url);
-                        $channum = $urlarray[count($urlarray)-1]; 
-                        $channame = vdrgetchanname($channum);
+                        $channame = end(explode("/", $url));
+                        $channum = vdrgetchannum($channame);
                         break;
                 case 'rec':
                         list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
@@ -134,6 +133,8 @@ function sessioncreate($type, $url, $mode)
 create_link:
 	// Create link
 	exec ('ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
+
+	sqlsetuserstat("last_channel", $username, $channame);
 
 	return $session;
 }

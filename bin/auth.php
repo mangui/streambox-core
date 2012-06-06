@@ -19,6 +19,11 @@ if ($_SESSION['authorized'] == false)
 			$_SESSION['authorized'] = true;
 			addlog("AUTH: user [" .$username ."] successfully identified!");
 			addstreaminglog("iStreamDev user [" .$username ."] successfully identified!");
+
+			sqlsetuserstat("last_connection", $username, date("Y/m/d H:i:s"));
+			$num=sqlgetuserstat("num_connections", $username);
+			$num++;
+			sqlsetuserstat("num_connections", $username, $num);
 		}
 	}
 

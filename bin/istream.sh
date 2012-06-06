@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STREAM=$1
+STREAM="$1"
 VRATE=$2
 ARATE=$3
 XY=$4
@@ -47,17 +47,19 @@ mkfifo ./fifo
 
 if [ ! -z "$DIR" ]
 then
-	FFMPEGPREFIX="$CURDIR/cat_recording.sh $DIR"
+	# Start ffmpeg
+	(trap "rm -f ./ffmpeg.pid; rm -f ./fifo" EXIT HUP INT TERM ABRT; \
+	 $CURDIR/cat_recording.sh $DIR | $FFPATH -i - -deinterlace -f mpegts -acodec libmp3lame -ab $ARATE -ac 2 -s $XY -vcodec libx264 -b $VRATE -flags +loop+mv4 \
+	 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -subq 7 -trellis 1 -refs 5 -coder 0 -me_range 16 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 \
+	 -bt $VRATE -maxrate $VRATE -bufsize $VRATE  -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -r 30 -g 90 -async 2 -threads 4 \
+	 - 2>$FFMPEGLOG 1>./fifo) &
 else
-	FFMPEGPREFIX="wget "$STREAM" -O -"
+	(trap "rm -f ./ffmpeg.pid; rm -f ./fifo" EXIT HUP INT TERM ABRT; \
+	 wget "$STREAM" -O - | $FFPATH -i - -deinterlace -f mpegts -acodec libmp3lame -ab $ARATE -ac 2 -s $XY -vcodec libx264 -b $VRATE -flags +loop+mv4 \
+	 -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -subq 7 -trellis 1 -refs 5 -coder 0 -me_range 16 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 \
+	 -bt $VRATE -maxrate $VRATE -bufsize $VRATE  -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -r 30 -g 90 -async 2 -threads 4 \
+	 - 2>$FFMPEGLOG 1>./fifo) &
 fi
-
-# Start ffmpeg
-(trap "rm -f ./ffmpeg.pid; rm -f ./fifo" EXIT HUP INT TERM ABRT; \
- $FFMPEGPREFIX | $FFPATH -i - -deinterlace -f mpegts -acodec libmp3lame -ab $ARATE -ac 2 -s $XY -vcodec libx264 -b $VRATE -flags +loop+mv4 \
- -cmp 256 -partitions +parti4x4+partp8x8+partb8x8 -subq 7 -trellis 1 -refs 5 -coder 0 -me_range 16 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 \
- -bt $VRATE -maxrate $VRATE -bufsize $VRATE  -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -r 30 -g 90 -async 2 -threads 4 \
- - 2>$FFMPEGLOG 1>./fifo) &
 
 sleep 1
 
