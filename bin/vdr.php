@@ -70,7 +70,7 @@ function vdrgetcategories()
 			}
 
 			// Check rights
-			if (strstr($curcat, $rights) == "")
+			if (strstr($rights,$curcat) == "")
 			{
 				$curcat="";
 				continue;
