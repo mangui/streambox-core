@@ -41,6 +41,7 @@
 				'3g'	=>	'350k	64k	408x272',
 				'wifi'	=>	'512k	128k	480x320');
 	$maxencodingprocesses=3;		// Max simultaneous encoding processes
+	$encodingscript='./istream.sh';
 
 	// Misc
 	$ffmpegpath='/usr/bin/ffmpeg';		//path to ffmpeg binary
