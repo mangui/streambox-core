@@ -1,7 +1,7 @@
 <?php
 function sessioncreate($type, $url, $mode)
 {
-	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile;
+	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username;
 
 	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
@@ -107,13 +107,13 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "./istream.sh \"" .$url ."\" " .$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
 			break;
 		case 'rec':
-			$cmd = "./istream.sh - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."\" >/dev/null 2>&1 &";
+			$cmd = "".$encodingscript." - ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."\" >/dev/null 2>&1 &";
 			break;
 		case 'vid':
-			$cmd = "./istream.sh \"" .$url ."\" " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
                         break;
 		default:
 			$cmd = "";
@@ -252,7 +252,14 @@ function sessiondeletesingle($session)
 	// Then kill segmenter
 	if (is_pid_running($ram ."segmenter.pid"))
 		$cmd .= " kill -9 `cat " .$ram ."segmenter.pid`; rm " .$ram ."segmenter.pid; ";
-
+	if (is_pid_running($ram ."segmenter2.pid"))
+		$cmd .= " kill -9 `cat " .$ram ."segmenter2.pid`; rm " .$ram ."segmenter2.pid; ";
+	if (is_pid_running($ram ."segmenter3.pid"))
+		$cmd .= " kill -9 `cat " .$ram ."segmenter3.pid`; rm " .$ram ."segmenter3.pid; ";
+	if (is_pid_running($ram ."segmenter4.pid"))
+		$cmd .= " kill -9 `cat " .$ram ."segmenter4.pid`; rm " .$ram ."segmenter4.pid; ";
+	if (is_pid_running($ram ."segmenter5.pid"))
+		$cmd .= " kill -9 `cat " .$ram ."segmenter5.pid`; rm " .$ram ."segmenter5.pid; ";
 	addlog("Sending session kill command: " .$cmd);
 
 	$cmd .= "rm -rf " .$ram;
