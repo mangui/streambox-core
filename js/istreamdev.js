@@ -197,7 +197,7 @@ $('#streaming').bind('pageAnimationStart', function(event, info){
 	var session = $('#streaming span[rel="session"]').text();
 	if (info.direction == 'out') {
 		var time = new Date();
-		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
 		}  
 	})
 });
@@ -525,7 +525,7 @@ function gen_streaming(session) {
 			function(data){	
 			var stream = data.stream;
 			var time = new Date();
-			streaming.find('#thumbnail').attr('src','ram/session' + stream.session + '/thumb.png?'+time);
+			streaming.find('#thumbnail').attr('src','ram/sessions/session' + stream.session + '/thumb.png?'+time);
 			streaming.find('span[rel="thumbwidth"]').html(stream.thumbwidth);
 			streaming.find('span[rel="thumbheight"]').html(stream.thumbheight);
 			if (stream.type == "tv") 
