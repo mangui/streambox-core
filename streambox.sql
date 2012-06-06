@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` text NOT NULL,
   `email` text NOT NULL,
   `date_added` text NOT NULL,
-  `rights` int(11) NOT NULL
+  `rights` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`username`, `password`, `email`, `date_added`, `rights`) VALUES
-('user1', 'user1', 'user1@email.com', '31/05/12', 100),
-('user2', 'user2', 'user2@email.com', '01/06/12', 5);
+('user1', 'user1', 'user1@email.com', '31/05/12', '[TNT]'),
+('user2', 'user2', 'user2@email.com', '01/06/12', '[TNT] [NONFREE]');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

@@ -197,7 +197,7 @@ $('#streaming').bind('pageAnimationStart', function(event, info){
 	var session = $('#streaming span[rel="session"]').text();
 	if (info.direction == 'out') {
 		var time = new Date();
-		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
 		}  
 	})
 });
@@ -456,7 +456,7 @@ function gen_streamchannel(channame,channumber) {
 	stream_channel = $('#streamchannel');
 	stream_channel.find('h1').html( '<img class="menuicon" src="img/tv.png" /> ' +channame);
 	stream_channel.find('#thumbnail').attr('src','logos/' + channame + ".png");
-	var dataString = "action=getChanInfo&chan=" + channumber;
+	var dataString = "action=getChanInfo&chan=" + channame;
 	//Json call to get tv program info
 	$.getJSON("bin/backend.php",
 			dataString,
@@ -467,7 +467,7 @@ function gen_streamchannel(channame,channumber) {
 			stream_channel.find('span[class="desc_now"]').html( program.now_desc );
 			stream_channel.find('span[class="name_next"]').html( 'Next: ' + program.next_title );
 			stream_channel.find('span[class="epgtime_next"]').html( program.next_time );
-			stream_channel.find('span[rel="url"]').html(streamdev_server + channumber);
+			stream_channel.find('span[rel="url"]').html(streamdev_server + channame);
             stream_channel.find('span[rel="type"]').html('tv');
 			stream_channel.find('span[rel="number"]').html(channumber);
 			stream_channel.find('span[rel="channame"]').html(channame);
@@ -525,7 +525,7 @@ function gen_streaming(session) {
 			function(data){	
 			var stream = data.stream;
 			var time = new Date();
-			streaming.find('#thumbnail').attr('src','ram/session' + stream.session + '/thumb.png?'+time);
+			streaming.find('#thumbnail').attr('src','ram/sessions/session' + stream.session + '/thumb.png?'+time);
 			streaming.find('span[rel="thumbwidth"]').html(stream.thumbwidth);
 			streaming.find('span[rel="thumbheight"]').html(stream.thumbheight);
 			if (stream.type == "tv") 
