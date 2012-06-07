@@ -8,6 +8,12 @@ timeout_seconds=1800
 
 for session in `\ls $ram_path/sessions/ | grep session`;
 do
+	# Only check live ones
+	if [ "`cat $ram_path/sessions/$session/streaminfo | grep "type="`" != "type=tv" ]
+	then
+		continue
+	fi
+
 	# Check last time session was accessed
 	last_get="`cat $http_log | grep "GET /ram/sessions/$session/stream.m3u8" | tail -n 1`"
 	last_date="`echo "$last_get" | awk -F\[ '{ print $2 }' | awk -F\] '{ print $1 }'`"
