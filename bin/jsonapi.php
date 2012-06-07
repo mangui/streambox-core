@@ -2,15 +2,10 @@
 
 function getGlobals()
 {
-	global $vdrstreamdev, $vdrrecpath, $mediasource, $videosource, $audiosource;
+	global $mediasource, $videosource, $audiosource;
 	global $enablevdr, $enablemediavideo, $enablemediaaudio, $vdrepgmaxdays;
 
 	$ret = array();
-	if ($enablevdr)
-		$ret['streamdev_server'] = $vdrstreamdev;
-	else
-		$ret['streamdev_server'] = "";
-	$ret['rec_path'] = $vdrrecpath;
 	if ($enablemediavideo)
 		$ret['video_path'] = $videosource;
 	else
@@ -170,12 +165,12 @@ function getRunningSessions()
 
 }
 
-function browseFolder($path)
+function browseFolder($path, $type)
 {
 	$ret = array();
 
-	$ret['list'] = filesgetlisting($path);
-	
+	$ret['list'] = filesgetlisting($path, $type);
+
 	return json_encode($ret);
 }
 

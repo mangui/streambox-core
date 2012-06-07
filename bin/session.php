@@ -2,7 +2,7 @@
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
-	global $username;
+	global $username, $vdrstreamdev, $vdrrecpath;
 
 	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
 
@@ -14,7 +14,7 @@ function sessioncreate($type, $url, $mode)
         switch ($type)
         {
                 case 'tv':
-                        $channame = end(explode("/", $url));
+                        $channame = $url;
                         $channum = vdrgetchannum($channame);
                         break;
                 case 'rec':
@@ -107,13 +107,13 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." " .$vdrstreamdev .$url ." " .$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
 			break;
 		case 'rec':
-			$cmd = "".$encodingscript." - ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$vdrrecpath .$url ."\" >/dev/null 2>&1 &";
 			break;
 		case 'vid':
-			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." " .$url ." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
                         break;
 		default:
 			$cmd = "";

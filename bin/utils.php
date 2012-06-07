@@ -100,17 +100,9 @@ function isurlvalid($url, $type)
 	switch ($type)
 	{
 		case 'tv':
-
-			// Check that this is a correct URL
-			if (strncmp($vdrstreamdev, $url, strlen($vdrstreamdev)))
-				return 0;
-
 			break;
 
 		case 'rec':
-			if (strncmp($vdrrecpath, $url, strlen($vdrrecpath)))
-				return 0;
-
 			// Dont allow ..
 			if (preg_match("$\.\.$", $url))
 				return 0;

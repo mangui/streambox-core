@@ -172,11 +172,27 @@ function generatelogo($type, $name, $dest)
         }
 }
 
-function filesgetlisting($dir)
+function filesgetlisting($dir, $type)
 {
-	global $username;
+	global $username, $vdrrecpath, $videosource, $audiosource;
 
-	addlog("Listing dir: " .$dir);
+	addlog("Listing for type " .$type ." dir: " .$dir);
+
+	switch ($type)
+	{
+		case "rec":
+			$predir = $vdrrecpath;
+			break;
+		case "vid":
+			$predir = $videosource;
+			break;
+		case "aud":
+			$predir = $audiosource;
+			break;
+		default:
+			$predir = "";
+			break;
+	}
 
 	$filelisting = array();
 	$folderlisting = array();
@@ -189,7 +205,7 @@ function filesgetlisting($dir)
 	if (preg_match("$\.\.$", $dir))
 		return array();
 
-	$dir_handle = @opendir($dir);
+	$dir_handle = @opendir($predir .$dir);
 	if (!$dir_handle)
 		return array();
 
@@ -212,7 +228,7 @@ function filesgetlisting($dir)
 	// List files and folders
 	foreach($medianame_array as $value)
 	{
-		$type = filegettype($dir ."/" .$value);
+		$type = filegettype($predir .$dir ."/" .$value);
 
 		$newentry = array();
 		$newentry['name'] = $value;
@@ -222,7 +238,7 @@ function filesgetlisting($dir)
 		switch ($type)
 		{
 			case 'audio':
-				list($newentry['trackname'], $newentry['length']) = mediagetmusicinfo($dir ."/" .$value);
+				list($newentry['trackname'], $newentry['length']) = mediagetmusicinfo($predir .$dir ."/" .$value);
 				$newentry['number'] = $number;
 				$number++;
 				$filelisting[] = $newentry;
@@ -237,7 +253,13 @@ function filesgetlisting($dir)
 					$folderlisting[] = $newentry;
 				break;
 			case 'rec':
-				if (end(explode(".", $file)) == "rec")
+
+				if (    ( $dir == "./" && substr($value,  0, strlen($username)+1) != ($username ."_"))
+				||      ( $dir != "./" && substr($dir,  2, strlen($username)+1) != ($username ."_"))
+					)
+					continue;
+
+				if (end(explode(".", $value)) == "rec")
 				{
 					$date = preg_replace('/-/', '/', substr($value, 0, 10));
 					$time = preg_replace('/\./', 'h', substr($value, 11, 5));
@@ -246,11 +268,11 @@ function filesgetlisting($dir)
 				}
 				else
 				{
-					if ( (substr($value, 0, strlen($username)+1)) != ("$username" ."_") )
-						continue;
-					$newentry['name'] = $value;
+					$newentry['name'] = substr($value, strlen($username)+1);
 					$newentry['type'] = 'folder';
 				}
+
+				$newentry['path'] = $newentry['path'] .'/';
 
 				$folderlisting[] = $newentry;
 				break;
