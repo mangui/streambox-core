@@ -6,8 +6,6 @@ istreamdev_log=
 
 timeout_seconds=1800
 
-#78.31.46.6 - - [07/Jun/2012:18:40:20 +0200] "GET /ram/sessions/session0/stream-5.ts HTTP/1.1" 200 857766
-
 for session in `\ls $ram_path/sessions/ | grep session`;
 do
 	# Check last time session was accessed
