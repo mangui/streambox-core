@@ -1,6 +1,6 @@
 #!/bin/bash
 
-STREAM=$1
+STREAM="$1"
 
 VRATE1=110k
 ARATE1=48k
@@ -27,7 +27,7 @@ ARATE5=48k
 BW5=740000
 XY5=640x480
 
-HTTP_PATH="$5ram/"
+HTTP_PATH="$5ram/sessions/"
 
 SEGDUR=10		# Length of Segments produced (between 10 and 30)
 SEGWIN=$6		# Amount of Segments to produce 
@@ -58,20 +58,20 @@ fi
 ##############################################################
 
 # Check that the session dir exists
-if [ ! -e ../ram/$SESSION ]
+if [ ! -e ../ram/sessions/$SESSION ]
 then
 	exit;
 fi
 
-cd ../ram/$SESSION
+cd ../ram/sessions/$SESSION
 mkfifo ./fifo1 ./fifo2 ./fifo3 ./fifo4 ./fifo5
 
 if [ ! -z "$DIR" ]
 then
 	FFMPEGPREFIX="$CURDIR/cat_recording.sh $DIR"
 else
-#	FFMPEGPREFIX="wget -d --dot-style=mega -o "$WGETLOG" "$STREAM" -O -"
-	FFMPEGPREFIX="cat /dev/null"
+	FFMPEGPREFIX="wget "$STREAM" -O -"
+#	FFMPEGPREFIX="cat /dev/null"
 fi
 
 STREAM1=stream_"$VRATE1"_"$ARATE1"_$XY1
@@ -103,7 +103,7 @@ VIDEO_OPTION="-vcodec libx264 -flags +loop+mv4 -cmp 256 -partitions +parti4x4+pa
 # Start ffmpeg
 echo start > $FFMPEGLOG
 (trap "rm -f ./ffmpeg.pid; rm -f ./fifo*" EXIT HUP INT TERM ABRT; \
- $FFMPEGPREFIX | $FFPATH -i "$STREAM" -y \
+ $FFMPEGPREFIX | $FFPATH -i - -y \
  $COMMON_OPTION  $AUDIO_OPTION $ARATE1 -s $XY1 $VIDEO_OPTION -keyint_min 25 -r 25 -g 250 -b:v $VRATE1 -bt $VRATE1 -maxrate $VRATE1 -bufsize $VRATE1 ./fifo1 \
  $COMMON_OPTION  $AUDIO_OPTION $ARATE2 -s $XY2 $VIDEO_OPTION -keyint_min 25 -r 25 -g 250 -b:v $VRATE2 -bt $VRATE2 -maxrate $VRATE2 -bufsize $VRATE2 ./fifo2 \
  $COMMON_OPTION  $AUDIO_OPTION $ARATE3 -s $XY3 $VIDEO_OPTION -keyint_min 25 -r 25 -g 250 -b:v $VRATE3 -bt $VRATE3 -maxrate $VRATE3 -bufsize $VRATE3 ./fifo3 \
@@ -111,13 +111,13 @@ echo start > $FFMPEGLOG
  $COMMON_OPTION  $AUDIO_OPTION $ARATE5 -s $XY5 $VIDEO_OPTION -keyint_min 25 -r 25 -g 250 -b:v $VRATE5 -bt $VRATE5 -maxrate $VRATE5 -bufsize $VRATE5 ./fifo5 \
  2>$FFMPEGLOG) &
 
-sleep 0.5
+sleep 1
 
 # Store ffmpeg pid
 FFPID=$!
 if [ ! -z "$FFPID" ]
 then
-	SPID=`\ps ax --format "%p %c %P" | grep "$FFPID$" | awk {'print $1'}`;
+	SPID=`\ps ax --format "%p %c %P" | grep "$FFPID$" | grep -v wget | grep -v cat | awk {'print $1'}`;
 	if [ ! -z "$SPID" ]
 	then
 		echo $SPID > ./ffmpeg.pid
