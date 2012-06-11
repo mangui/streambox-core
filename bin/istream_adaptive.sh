@@ -3,14 +3,12 @@
 ###########################
 # Configuration
 ###########################
-NBQUALITIES=5
+NBQUALITIES=3
 declare -a QUALITIES
-#			VRATE	ARATE	BW	XY
-QUALITIES=(	[1]="	110k	48k	180000	320x240"	\
-		[2]="	200k	48k	280000	320x240"	\
-		[3]="	300k	48k	400000	320x240"	\
-		[4]="	400k	48k	510000	480x320"	\
-		[5]="	600k	48k	740000	640x380"	\
+#			VRATE	ARATE	XY
+QUALITIES=(	[1]="	200k	48k	320x240"	\
+		[2]="	350k	48k	480x320"	\
+		[3]="	750k	64k	720x576"	\
 	  )
 
 ##########################
@@ -32,10 +30,14 @@ function get_quality
 		echo $qualities | awk '{ print $2}'
 		;;
 	"BW")
-		echo $qualities | awk '{ print $3}'
+		vrate=`echo $qualities | awk '{ print $1}'`
+		vrate=${vrate:0:-1}
+		arate=`echo $qualities | awk '{ print $2}'`
+		arate=${arate:0:-1}
+		echo $((vrate*1024 + vrate*102 + arate*1024 + arate*102))
 		;;
 	"XY")
-		echo $qualities | awk '{ print $4}'
+		echo $qualities | awk '{ print $3}'
 		;;
         *)
 		echo "0"
@@ -93,14 +95,6 @@ do
 	mkfifo ./fifo${fifoid}
 done
 
-# Manage recordings
-if [ ! -z "$DIR" ]
-then
-	FFMPEGPREFIX="$CURDIR/cat_recording.sh $DIR"
-else
-	FFMPEGPREFIX="wget "$STREAM" -O -"
-fi
-
 #create master playlist
 echo "#EXTM3U" > stream.m3u8
 for streamid in `seq 1 $NBQUALITIES`
@@ -125,7 +119,12 @@ do
 
 done
 
-$FFMPEGPREFIX | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+if [ ! -z "$DIR" ]
+then
+	$CURDIR/cat_recording.sh $DIR | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+else
+        wget "$STREAM" -O - | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+fi
 
 sleep 0.5
 
