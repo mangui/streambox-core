@@ -1,8 +1,8 @@
 #!/bin/bash
 
-http_log=
-ram_path=
-istreamdev_log=
+http_log=/home/BoB/logs/access.log
+ram_path=/home/BoB/www/streambox/ram/
+istreamdev_log=/home/BoB/logs/streambox.log
 
 timeout_seconds=1800
 

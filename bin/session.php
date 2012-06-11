@@ -2,7 +2,7 @@
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
-	global $username, $vdrstreamdev, $vdrrecpath;
+	global $username, $vdrstreamdev, $vdrrecpath, $adaptive;
 
 	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
 
@@ -104,6 +104,10 @@ function sessioncreate($type, $url, $mode)
 
 	// Start encoding
 	$url = str_replace("\\'", "'", $url);
+	if ($adaptive)
+		$encodingscript="./istream_adaptive.sh";
+	else
+		$encodingscript="./istream.sh";
 	switch ($type)
 	{
 		case 'tv':
@@ -246,20 +250,22 @@ function sessiondeletesingle($session)
 	$cmd = "";
 
 	// First kill ffmpeg
-	if (is_pid_running($ram ."ffmpeg.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."ffmpeg.pid`; rm " .$ram ."ffmpeg.pid; ";
+	$ffmpegpid=is_pid_running($ram ."ffmpeg.pid");
+	if ( $ffmpegpid != 0 )
+		$cmd .= " kill -9 " .$ffmpegpid ."; rm " .$ram ."ffmpeg.pid; ";
 
 	// Then kill segmenter
-	if (is_pid_running($ram ."segmenter.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter.pid`; rm " .$ram ."segmenter.pid; ";
-	if (is_pid_running($ram ."segmenter2.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter2.pid`; rm " .$ram ."segmenter2.pid; ";
-	if (is_pid_running($ram ."segmenter3.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter3.pid`; rm " .$ram ."segmenter3.pid; ";
-	if (is_pid_running($ram ."segmenter4.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter4.pid`; rm " .$ram ."segmenter4.pid; ";
-	if (is_pid_running($ram ."segmenter5.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter5.pid`; rm " .$ram ."segmenter5.pid; ";
+	exec('cat ' .$ram .'segmenter.pid', $output);
+	$nbsegmenterpid=count($output);
+	for ($i=0; $i<$nbsegmenterpid; $i++)
+	{
+		$segmenterpid=is_pid_running($ram ."segmenter.pid", $i+1);
+		if ($segmenterpid != 0)
+			$cmd .= "kill -9 " .$segmenterpid ."; ";
+	}
+
+	$cmd .= "rm " .$ram ."segmenter.pid; ";
+
 	addlog("Sending session kill command: " .$cmd);
 
 	$cmd .= "rm -rf " .$ram;
@@ -285,7 +291,7 @@ function getstreamingstatus($session)
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-		if (count(glob($path . '/*.ts')) < 3) /* */
+		if (count(glob($path . '/*.ts')) == 0) /* */
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
@@ -319,8 +325,7 @@ function getstreamingstatus($session)
 			$status['message'] .= "<br>  * Segmenter: ";
 			if (is_pid_running($path .'/segmenter.pid'))
 			{
-				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob($path . '/*.ts')) ."/3)</i>"; /**/
+				$status['message'] .= "<i>starting</i>";
 			}
 			else
 				$status['message'] .= "<i>stopped</i>";
@@ -334,7 +339,7 @@ function getstreamingstatus($session)
 			$status['message'] .= "<br>  * Quality: <i>" .$mode ."</i>";
 			$status['message'] .= "<br>  * Status: ";
 			if (is_pid_running($path .'/segmenter.pid'))
-				$status['message'] .= "<i>encoding...</i>";
+				$status['message'] .= "<i>live streaming</i>";
 			else
 				$status['message'] .= "<i>fully encoded</i>";
 

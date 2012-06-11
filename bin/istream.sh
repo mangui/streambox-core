@@ -30,7 +30,7 @@ fi
 
 #############################################################
 # start dumping the TS via Streamdev into a pipe for ffmpeg
-# and store baseline 3.0 mpegts to outputfile  
+# and store baseline 3.0 mpegts to outputfile
 # sending it to the segmenter via a PIPE
 ##############################################################
 
