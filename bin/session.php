@@ -136,7 +136,7 @@ function sessioncreate($type, $url, $mode)
 
 create_link:
 	// Create link
-	exec ('ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
+	exec ('mkdir ../ram/' .$username .'; ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
 
 	sqlsetuserstat("last_channel", $username, $channame);
 
