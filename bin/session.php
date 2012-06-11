@@ -317,18 +317,19 @@ function getstreamingstatus($session)
 
 			$status['message'] .= "<br>";
 
-			$status['message'] .= "<br>  * FFmpeg: ";
+			$status['message'] .= "<br>  Starting encoding, please wait... (F:";
 			if (is_pid_running($path .'/ffmpeg.pid'))
-				$status['message'] .= "<i>running</i>";
+				$status['message'] .= "Y";
 			else
-				$status['message'] .= "<i>stopped</i>";
-			$status['message'] .= "<br>  * Segmenter: ";
+				$status['message'] .= "N";
+			$status['message'] .= ", S:";
 			if (is_pid_running($path .'/segmenter.pid'))
 			{
-				$status['message'] .= "<i>starting</i>";
+				$status['message'] .= "Y";
 			}
 			else
-				$status['message'] .= "<i>stopped</i>";
+				$status['message'] .= "N";
+			$status['message'] .= ")";
 		}
 		else
 		{

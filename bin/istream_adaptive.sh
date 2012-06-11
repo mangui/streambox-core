@@ -126,11 +126,10 @@ else
         wget "$STREAM" -O - | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
 fi
 
-sleep 0.5
+sleep 1
 
 # Store ffmpeg pid
 FFPID=$!
-echo $FFPID >> /tmp/aaa
 if [ ! -z "$FFPID" ]
 then
 	SPID=`\ps ax --format "%p %c %P" | grep "^$FFPID" | grep ffmpeg | awk {'print $1'}`;
