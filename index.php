@@ -148,7 +148,7 @@ ob_start();
 			<div rel="dataholder" style="visibility:hidden">
                 <span rel="type"></span>
                 <span rel="url"></span>
-            </div>	
+            </div>
 		</div>
 
 		<div id="streaming">
@@ -157,7 +157,15 @@ ob_start();
 			<a href="#home" id="home_but" class="button">Home</a>
                 <h1></h1>
 			</div>
-			<center><ul class="thumb" id="player"><img class="thumbnail" id="thumbnail" src="" /></ul></center>
+			<center>
+				<div id="mediaplayer">
+		                        <script type="text/javascript" src="js/jwplayer.js"></script>
+				</div>
+				<ul class="thumb" id="player">
+	                        	<span rel="ready"></span>
+				</ul>
+			</center>
+
 			<ul class="streamstatus">
 				<span class="title">Status</span>
 				<span class="mode"></span>

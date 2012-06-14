@@ -47,7 +47,8 @@
 	//////////////////////////////////////////////////////////////////
 
 	$maxencodingprocesses=10;				// Max simultaneous encoding processes
-        $adaptative=1;
+	$adaptative=1;						// Enable adaptive streaming
+	$debugadaptive=0;					// Adaptive streaming monitoring directly on the picture
 
 	// Misc
 	$ffmpegpath='/usr/bin/ffmpeg';		//path to ffmpeg binary

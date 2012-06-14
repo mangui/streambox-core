@@ -3,12 +3,13 @@
 ###########################
 # Configuration
 ###########################
-NBQUALITIES=3
+NBQUALITIES=4
 declare -a QUALITIES
 #			VRATE	ARATE	XY
 QUALITIES=(	[1]="	200k	48k	320x240"	\
 		[2]="	350k	48k	480x320"	\
-		[3]="	750k	64k	720x576"	\
+		[3]="	750k	64k	640x480"	\
+		[4]="	900k	64k	720x576"	\
 	  )
 
 ##########################

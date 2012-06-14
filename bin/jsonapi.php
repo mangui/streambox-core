@@ -3,7 +3,8 @@
 function getGlobals()
 {
 	global $mediasource, $videosource, $audiosource;
-	global $enablevdr, $enablemediavideo, $enablemediaaudio, $vdrepgmaxdays, $adaptive;
+	global $enablevdr, $enablemediavideo, $enablemediaaudio, $vdrepgmaxdays;
+	global $adaptive, $debugadaptive;
 
 	$ret = array();
 	if ($enablemediavideo)
@@ -16,6 +17,7 @@ function getGlobals()
 		$ret['audio_path'] = "";
 	$ret['epg_maxdays'] = $vdrepgmaxdays;
 	$ret['adaptive'] = $adaptive;
+	$ret['debugadaptive'] = $debugadaptive;
 
 	return json_encode($ret);
 }
