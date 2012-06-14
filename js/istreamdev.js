@@ -195,7 +195,8 @@ $('#streaming').bind('pageAnimationStart', function(event, info){
 	var session = $('#streaming span[rel="session"]').text();
 	if (info.direction == 'out') {
 		var time = new Date();
-		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #thumbnail').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #player').html('<div id="mediaplayer"><script type="text/javascript" src="js/jwplayer.js"></script></div>');
 		}  
 	})
 });
@@ -529,7 +530,7 @@ function gen_streaming(session) {
 			if (stream.type == "tv") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/tv.png" onerror="this.src=\'img/nologoTV.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '90px');
+				streaming.find('#thumbnail').css('width', '90px');
 				var streaminfo = '<li><span class="name_now">Now: ' + stream.now_title + '</span>';
 				streaminfo += '<span class="epgtime_now">' + stream.now_time + '</span>';
 				streaminfo += '<span class="desc_now">' + stream.now_desc + '</span></li>';
@@ -540,7 +541,7 @@ function gen_streaming(session) {
 			else if (stream.type == "rec") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/record.png" onerror="this.src=\'img/nologoREC.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '90px');
+				streaming.find('$thumbnail').css('width', '90px');
 				var streaminfo = '<li><span class="name_now">' + stream.name + '</span>';
 				streaminfo += '<span class="epgtime_now">Recorded: ' + stream.recorded + '</span>';
 				streaminfo += '<span class="desc_now">' + stream.desc + '</span></li>';
@@ -549,7 +550,7 @@ function gen_streaming(session) {
 			else if (stream.type == "vid") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/video.png" onerror="this.src=\'img/nologoMEDIA.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '190px');
+				streaming.find('#thumbnail').css('width', '190px');
 				var streaminfo = '<li><span class="name_now">' + stream.name + '</span>';
 				streaminfo += '<span class="epgtime_now">Duration: ' + stream.duration + '</span>';
 				desc='<b>format: </b>' + stream.format + '<br><b>video: </b>' + stream.video + '<br><b>audio: </b>' + stream.audio + '<br><b>resolution: </b>' + stream.resolution;
@@ -601,10 +602,12 @@ function playvideo(session,name) {
 		var thumbheight = streaming.find('span[rel="thumbheight"]').text();
 		streaming.find('ul[class="streamstatus"]').find('span[class="mode"]').html(message);
 		if ( status == "ready" ) {
-			streaming.find('#player').removeAttr("style");	
+
+			$('#streaming #thumbnail').html('');
+
 			playerWidth=window.innerWidth/2;
 			playerHeight=(playerWidth*480)/640;
-			var playerPlugin='';
+			
 			if (debugadaptive)
 				jwplayer("mediaplayer").setup({
 					width: playerWidth,height: playerHeight,
@@ -622,6 +625,12 @@ function playvideo(session,name) {
 					]});
 
 			return false;
+		}
+		else
+		{
+	                var time = new Date();
+        	        $('#streaming #thumbnail').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+			$('#streaming #player').html('<div id="mediaplayer"><script type="text/javascript" src="js/jwplayer.js"></script></div>');
 		}
 		prevmsg = message;
 		status_Start(session,prevmsg);

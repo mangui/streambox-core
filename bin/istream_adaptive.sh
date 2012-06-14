@@ -131,14 +131,18 @@ sleep 1
 
 # Store ffmpeg pid
 FFPID=$!
+echo $FFPID > /tmp/aaa
+\ps ax --format "%p %c %P" >> /tmp/aaa
 if [ ! -z "$FFPID" ]
 then
 	SPID=`\ps ax --format "%p %c %P" | grep "^$FFPID" | grep ffmpeg | awk {'print $1'}`;
+	echo $SPID >> /tmp/aaa
 	if [ ! -z "$SPID" ]
 	then
 		echo $SPID > ./ffmpeg.pid
 	fi
 fi
+echo "TOTO" >> /tmp/aaa
 
 # Start Segmenters and store pids
 > ./segmenter.pid

@@ -153,30 +153,32 @@ ob_start();
 
 		<div id="streaming">
 			<div class="toolbar">
-			<a href="#" class="back">Back</a>
-			<a href="#home" id="home_but" class="button">Home</a>
-                <h1></h1>
+				<a href="#" class="back">Back</a>
+				<a href="#home" id="home_but" class="button">Home</a>
+	        	        <h1></h1>
 			</div>
-			<center>
+		<center>
+			<div id="thumbnail">
+			</div>
+			<div id="player">
 				<div id="mediaplayer">
-		                        <script type="text/javascript" src="js/jwplayer.js"></script>
+					<script type="text/javascript" src="js/jwplayer.js"></script>
 				</div>
-				<ul class="thumb" id="player">
-	                        	<span rel="ready"></span>
-				</ul>
-			</center>
+			</div>
 
-			<ul class="streamstatus">
-				<span class="title">Status</span>
-				<span class="mode"></span>
-			</ul>
-			<ul class="streaminfo">
-			</ul>
-			<center>
-				<span class="streamButton"><a rel="stopbroadcast" href="#">Stop stream</a></span>
-				<br><br>
-			</center>
-			<div rel="dataholder" style="visibility:hidden">
+		</center>
+
+		<ul class="streamstatus">
+			<span class="title">Status</span>
+			<span class="mode"></span>
+		</ul>
+		<ul class="streaminfo">
+		</ul>
+		<center>
+			<span class="streamButton"><a rel="stopbroadcast" href="#">Stop stream</a></span>
+			<br><br>
+		</center>
+		<div rel="dataholder" style="visibility:hidden">
                 <span rel="session"></span>
 				<span rel="name"></span>
 				<span rel="thumbwidth"></span>
