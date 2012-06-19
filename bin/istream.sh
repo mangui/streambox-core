@@ -83,7 +83,7 @@ sleep 1
 SEGPID=$!
 if [ ! -z "$SEGPID" ]
 then
-	SPID=`\ps ax --format "%p %c %P" | grep "$SEGPID$" | grep segmenter | awk {'print $1'}`;
+	SPID=`\ps ax --format "%p %c %P" | grep "$SEGPID segmenter" | awk {'print $1'}`;
 	if [ ! -z "$SPID" ]
 	then
 		echo $SPID > ./segmenter.pid

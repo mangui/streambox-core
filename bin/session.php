@@ -111,7 +111,7 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "" .$encodingscript ." \"" .$vdrstreamdev .$url ."\" " .$qparams ." " .$httppath ." 2 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." \"" .$vdrstreamdev .$url ."\" " .$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
 			break;
 		case 'rec':
 			$cmd = "" .$encodingscript ." - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$vdrrecpath .$url ."\" >/dev/null 2>&1 &";

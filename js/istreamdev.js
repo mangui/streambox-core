@@ -611,6 +611,7 @@ function playvideo(session,name) {
 			if (debugadaptive)
 				jwplayer("mediaplayer").setup({
 					width: playerWidth,height: playerHeight,
+					autostart: 'true',
 					plugins: { 'swf/qualitymonitor.swf' : {} },
 					modes: [
 						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/adaptiveProvider.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
