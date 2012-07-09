@@ -100,13 +100,13 @@ done
 echo "#EXTM3U" > stream.m3u8
 for streamid in `seq 1 $NBQUALITIES`
 do
-	echo "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=`get_quality $streamid BW`" >> stream.m3u8
+	echo "#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=`get_quality $streamid BW`,RESOLUTION=`get_quality $streamid XY`" >> stream.m3u8
 	echo "`get_stream_name $streamid`".m3u8 >> stream.m3u8
 done
 
 COMMON_OPTION="-filter:v yadif -f mpegts -async 2 -threads 0 "
 AUDIO_OPTION="-acodec libaacplus -ac 2 -b:a "
-VIDEO_OPTION="-vcodec libx264 -flags +loop+mv4 -cmp 256 -partitions +parti4x4+parti8x8+partp4x4+partp8x8+partb8x8 -me_method hex -subq 7 -trellis 1 -refs 5 -coder 0 -me_range 16 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -sc_threshold 0 -bf 0 "
+VIDEO_OPTION="-vcodec libx264 -flags +loop+mv4 -cmp 256 -partitions +parti4x4+parti8x8+partp4x4+partp8x8+partb8x8 -me_method hex -subq 7 -trellis 1 -refs 5 -coder 0 -me_range 16 -i_qfactor 0.71 -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 30 -sc_threshold 0 "
 
 # Start ffmpeg
 echo start > $FFMPEGLOG
