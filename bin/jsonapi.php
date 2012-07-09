@@ -2,15 +2,11 @@
 
 function getGlobals()
 {
-	global $vdrstreamdev, $vdrrecpath, $mediasource, $videosource, $audiosource;
+	global $mediasource, $videosource, $audiosource;
 	global $enablevdr, $enablemediavideo, $enablemediaaudio, $vdrepgmaxdays;
+	global $adaptive, $debugadaptive;
 
 	$ret = array();
-	if ($enablevdr)
-		$ret['streamdev_server'] = $vdrstreamdev;
-	else
-		$ret['streamdev_server'] = "";
-	$ret['rec_path'] = $vdrrecpath;
 	if ($enablemediavideo)
 		$ret['video_path'] = $videosource;
 	else
@@ -20,6 +16,8 @@ function getGlobals()
 	else
 		$ret['audio_path'] = "";
 	$ret['epg_maxdays'] = $vdrepgmaxdays;
+	$ret['adaptive'] = $adaptive;
+	$ret['debugadaptive'] = $debugadaptive;
 
 	return json_encode($ret);
 }
@@ -170,12 +168,12 @@ function getRunningSessions()
 
 }
 
-function browseFolder($path)
+function browseFolder($path, $type)
 {
 	$ret = array();
 
-	$ret['list'] = filesgetlisting($path);
-	
+	$ret['list'] = filesgetlisting($path, $type);
+
 	return json_encode($ret);
 }
 

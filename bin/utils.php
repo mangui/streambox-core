@@ -100,17 +100,9 @@ function isurlvalid($url, $type)
 	switch ($type)
 	{
 		case 'tv':
-
-			// Check that this is a correct URL
-			if (strncmp($vdrstreamdev, $url, strlen($vdrstreamdev)))
-				return 0;
-
 			break;
 
 		case 'rec':
-			if (strncmp($vdrrecpath, $url, strlen($vdrrecpath)))
-				return 0;
-
 			// Dont allow ..
 			if (preg_match("$\.\.$", $url))
 				return 0;
@@ -182,23 +174,23 @@ if (!function_exists('json_encode'))
   }
 }
 
-function is_pid_running($pidfile)
+function is_pid_running($pidfile, $pidindex=1)
 {
 	// Check file
 	if (!file_exists($pidfile))
 		return 0;
 
-	// Check if pid has a pid inside
-	exec('cat ' .$pidfile, $output);
-	if (!is_numeric($output[0]))
+	// Check if pid file has a pid inside
+	exec('cat ' .$pidfile .' | head -n' .$pidindex .' | tail -n1', $output1);
+	if (!is_numeric($output1[0]))
 		return 0;
 
 	// Check if pid is running
-	exec('ps `cat ' .$pidfile .'`', $output);
-	if(count($output) < 2)
+	exec('ps ' .$output1[0], $output2);
+	if(count($output2) < 2)
 		return 0;
 
-	return 1;
+	return $output1[0];
 }
 
 ?>

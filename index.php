@@ -18,7 +18,7 @@ ob_start();
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta charset="UTF-8" />
-        <title>streambox</title>
+        <title>Streambox</title>
         <link rel="stylesheet" href="min/?b=css&f=jqtouch.css,theme.css,istreamdev.css,spinningwheel.css" type="text/css" media="screen" />
         <script src="min/?b=js&f=jquery-1.4.2.min.js,jqtouch.js,jqtouch.transitions.js,functions.js,spinningwheel.js,jquery.scrollTo-1.4.2.js,istreamdev.js" type="text/javascript" charset="utf-8"></script>
 	</head>
@@ -78,7 +78,12 @@ ob_start();
 			</ul>
 			<center>
 			<br>
-			<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="cube"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="cube">Wifi</a></span><span class="recButton"><a id="rec" href="#" class="cube">Rec.</a></span>
+<?php
+			if ($adaptive)
+				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span><span class=\"recButton\"><a id=\"rec\" href=\"#\" class=\"cube\">Rec.</a></span>";
+			else
+				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span><span class=\"recButton\"><a id=\"rec\" href=\"#\" class=\"cube\">Rec.</a></span>";
+?>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
@@ -104,7 +109,12 @@ ob_start();
 				</li>
 			</ul>
 			<center><br>
-			<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="cube"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="cube">Wifi</a></span>
+<?php
+			if ($adaptive)
+				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span>";
+			else
+				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span>";
+?>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
@@ -127,33 +137,48 @@ ob_start();
 				</li>
 			</ul>
 			<center><br>
-			<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="cube"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="cube">Wifi</a></span>
+<?php
+			if ($adaptive)
+				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span>";
+			else
+				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span>";
+?>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
                 <span rel="type"></span>
                 <span rel="url"></span>
-            </div>	
+            </div>
 		</div>
 
 		<div id="streaming">
 			<div class="toolbar">
-			<a href="#" class="back">Back</a>
-			<a href="#home" id="home_but" class="button">Home</a>
-                <h1></h1>
+				<a href="#" class="back">Back</a>
+				<a href="#home" id="home_but" class="button">Home</a>
+	        	        <h1></h1>
 			</div>
-			<center><ul class="thumb" id="player"><img class="thumbnail" id="thumbnail" src="" /></ul></center>
-			<ul class="streamstatus">
-				<span class="title">Status</span>
-				<span class="mode"></span>
-			</ul>
-			<ul class="streaminfo">
-			</ul>
-			<center>
-				<span class="streamButton"><a rel="stopbroadcast" href="#">Stop stream</a></span>
-				<br><br>
-			</center>
-			<div rel="dataholder" style="visibility:hidden">
+		<center>
+			<div id="thumbnail">
+			</div>
+			<div id="player">
+				<div id="mediaplayer">
+					<script type="text/javascript" src="js/jwplayer.js"></script>
+				</div>
+			</div>
+
+		</center>
+
+		<ul class="streamstatus">
+			<span class="title">Status</span>
+			<span class="mode"></span>
+		</ul>
+		<ul class="streaminfo">
+		</ul>
+		<center>
+			<span class="streamButton"><a rel="stopbroadcast" href="#">Stop stream</a></span>
+			<br><br>
+		</center>
+		<div rel="dataholder" style="visibility:hidden">
                 <span rel="session"></span>
 				<span rel="name"></span>
 				<span rel="thumbwidth"></span>
@@ -229,7 +254,7 @@ ob_start();
 		<div id="epg">
 			<div class="toolbar">
 					<a href="#" class="back">Home</a>
-						<h1>EPG</h1>
+						<h1>Program Guide</h1>
 				</div>
 			<ul class="rounded">
 			<li class="arrow"><a href="#" rel="whatsnow"><span class="menuname">WHAT'S NOW</span></a></li>

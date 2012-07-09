@@ -14,31 +14,65 @@ function sqlconnect()
 	return $mysqli;
 }
 
-function sqlgetuserinfo($type, $user)
+function sqlgettableentry($table, $type, $user)
 {
-	$info = "invalid";
+        $info = "error";
 
-	$mysqli = sqlconnect();
-	if (!$mysqli)
-		return array(0, 0, 0);
+        $mysqli = sqlconnect();
+        if (!$mysqli)
+                return "SQL connection failed";
 
-	$result = $mysqli->query("SELECT * FROM users WHERE username ='" .$user ."'");
-	if ($result)
+        $result = $mysqli->query("SELECT * FROM " .$table ." WHERE username ='" .$user ."'");
+        if ($result)
+        {
+                if ($result->num_rows == 1)
+                {
+                        $row = $result->fetch_assoc();
+                        $info = $row[$type];
+                }
+                else
+                        addlog("SQL: ERROR inexistant or multiple entries for user " .$user);
+
+                $result->close();
+        }
+
+        $mysqli->close();
+
+        return $info;
+}
+
+function sqlsettableentry($table, $type, $user, $value)
+{
+        $mysqli = sqlconnect();
+        if (!$mysqli)
+		return "SQL connection failed";
+
+	$result = $mysqli->query("UPDATE " .$table ." SET " .$type ."='" .$value ."' WHERE username ='" .$user ."'");
+	if (!$result)
 	{
-		if ($result->num_rows == 1)
-		{
-			$row = $result->fetch_assoc();
-			$info = $row[$type];
-		}
-		else
-			addlog("SQL: ERROR inexistant or multiple entries for user " .$user);
-
-		$result->close();
+		$mysqli->close();
+		return "SQL command failed";
 	}
 
-	$mysqli->close();
+        $mysqli->close();
 
-	return $info;
+	return "OK";
+}
+
+
+function sqlgetuserinfo($type, $user)
+{
+	return sqlgettableentry("users", $type, $user);
+}
+
+function sqlgetuserstat($type, $user)
+{
+        return sqlgettableentry("statistics", $type, $user);
+}
+
+function sqlsetuserstat($type, $user, $value)
+{
+	sqlsettableentry("statistics", $type, $user, $value);
 }
 
 ?>

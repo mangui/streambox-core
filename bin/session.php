@@ -2,7 +2,7 @@
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
-	global $username;
+	global $username, $vdrstreamdev, $vdrrecpath, $adaptive;
 
 	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
 
@@ -14,9 +14,8 @@ function sessioncreate($type, $url, $mode)
         switch ($type)
         {
                 case 'tv':
-                        $urlarray = explode("/", $url);
-                        $channum = $urlarray[count($urlarray)-1]; 
-                        $channame = vdrgetchanname($channum);
+                        $channame = $url;
+                        $channum = vdrgetchannum($channame);
                         break;
                 case 'rec':
                         list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
@@ -105,16 +104,20 @@ function sessioncreate($type, $url, $mode)
 
 	// Start encoding
 	$url = str_replace("\\'", "'", $url);
+	if ($adaptive)
+		$encodingscript="./istream_adaptive.sh";
+	else
+		$encodingscript="./istream.sh";
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." \"" .$vdrstreamdev .$url ."\" " .$qparams ." " .$httppath ." 3 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
 			break;
 		case 'rec':
-			$cmd = "".$encodingscript." - ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$url ."\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$vdrrecpath .$url ."\" >/dev/null 2>&1 &";
 			break;
 		case 'vid':
-			$cmd = "".$encodingscript." ".$url." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$cmd = "" .$encodingscript ." " .$url ." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
                         break;
 		default:
 			$cmd = "";
@@ -133,7 +136,9 @@ function sessioncreate($type, $url, $mode)
 
 create_link:
 	// Create link
-	exec ('ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
+	exec ('mkdir ../ram/' .$username .'; ln -fs ../sessions/' .$session .' ../ram/' .$username .'/');
+
+	sqlsetuserstat("last_channel", $username, $channame);
 
 	return $session;
 }
@@ -245,20 +250,22 @@ function sessiondeletesingle($session)
 	$cmd = "";
 
 	// First kill ffmpeg
-	if (is_pid_running($ram ."ffmpeg.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."ffmpeg.pid`; rm " .$ram ."ffmpeg.pid; ";
+	$ffmpegpid=is_pid_running($ram ."ffmpeg.pid");
+	if ( $ffmpegpid != 0 )
+		$cmd .= " kill -9 " .$ffmpegpid ."; rm " .$ram ."ffmpeg.pid; ";
 
 	// Then kill segmenter
-	if (is_pid_running($ram ."segmenter.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter.pid`; rm " .$ram ."segmenter.pid; ";
-	if (is_pid_running($ram ."segmenter2.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter2.pid`; rm " .$ram ."segmenter2.pid; ";
-	if (is_pid_running($ram ."segmenter3.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter3.pid`; rm " .$ram ."segmenter3.pid; ";
-	if (is_pid_running($ram ."segmenter4.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter4.pid`; rm " .$ram ."segmenter4.pid; ";
-	if (is_pid_running($ram ."segmenter5.pid"))
-		$cmd .= " kill -9 `cat " .$ram ."segmenter5.pid`; rm " .$ram ."segmenter5.pid; ";
+	exec('cat ' .$ram .'segmenter.pid', $output);
+	$nbsegmenterpid=count($output);
+	for ($i=0; $i<$nbsegmenterpid; $i++)
+	{
+		$segmenterpid=is_pid_running($ram ."segmenter.pid", $i+1);
+		if ($segmenterpid != 0)
+			$cmd .= "kill -9 " .$segmenterpid ."; ";
+	}
+
+	$cmd .= "rm " .$ram ."segmenter.pid; ";
+
 	addlog("Sending session kill command: " .$cmd);
 
 	$cmd .= "rm -rf " .$ram;
@@ -284,7 +291,7 @@ function getstreamingstatus($session)
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-		if (count(glob($path . '/*.ts')) < 3) /* */
+		if (count(glob($path . '/*.ts')) == 0) /* */
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
@@ -310,19 +317,19 @@ function getstreamingstatus($session)
 
 			$status['message'] .= "<br>";
 
-			$status['message'] .= "<br>  * FFmpeg: ";
+			$status['message'] .= "<br>  Starting encoding, please wait... (F:";
 			if (is_pid_running($path .'/ffmpeg.pid'))
-				$status['message'] .= "<i>running</i>";
+				$status['message'] .= "Y";
 			else
-				$status['message'] .= "<i>stopped</i>";
-			$status['message'] .= "<br>  * Segmenter: ";
+				$status['message'] .= "N";
+			$status['message'] .= ", S:";
 			if (is_pid_running($path .'/segmenter.pid'))
 			{
-				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob($path . '/*.ts')) ."/3)</i>"; /**/
+				$status['message'] .= "Y";
 			}
 			else
-				$status['message'] .= "<i>stopped</i>";
+				$status['message'] .= "N";
+			$status['message'] .= ")";
 		}
 		else
 		{
@@ -333,7 +340,7 @@ function getstreamingstatus($session)
 			$status['message'] .= "<br>  * Quality: <i>" .$mode ."</i>";
 			$status['message'] .= "<br>  * Status: ";
 			if (is_pid_running($path .'/segmenter.pid'))
-				$status['message'] .= "<i>encoding...</i>";
+				$status['message'] .= "<i>live streaming</i>";
 			else
 				$status['message'] .= "<i>fully encoded</i>";
 

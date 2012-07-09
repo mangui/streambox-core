@@ -508,14 +508,16 @@ function vdrgetepg($channel, $time, $day, $programs, $extended)
 
 function vdrgetrecinfo($rec)
 {
+	global $vdrrecpath;
+
 	addlog("VDR: vdrgetrecinfo(rec=" .$rec .")");
 
-	$infofile = $rec ."/info";
+	$infofile = $vdrrecpath .$rec ."/info";
 	if (file_exists($infofile))
 		$info= file_get_contents($infofile);
 	else
 	{
-		$infofile = $rec ."/info.vdr";
+		$infofile = $vdrrecpath .$rec ."/info.vdr";
 		if (file_exists($infofile))
 			$info= file_get_contents($infofile);
 		else

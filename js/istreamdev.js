@@ -59,18 +59,16 @@ $(document).ready(function(e){
 	$.getJSON("bin/backend.php",
 				dataString,
 				function(data){	
-				streamdev_server = data.streamdev_server;
-				rec_path = data.rec_path;
 				video_path = data.video_path;
 				audio_path = data.audio_path;
 				epg_maxdays = data.epg_maxdays;
-				if (streamdev_server != "" && streamdev_server != "null") {
+				adaptive = data.adaptive;
+				debugadaptive = data.debugadaptive;
 				addVdr();
 				showStatus( 0,"Getting channels list" );
 				gen_formchanlist();
 				gen_epgdatelist();
 				genepg_timelist();
-				}
 				if ( video_path != "" && video_path != "null") {
 				addVideofiles();
 				}
@@ -197,7 +195,8 @@ $('#streaming').bind('pageAnimationStart', function(event, info){
 	var session = $('#streaming span[rel="session"]').text();
 	if (info.direction == 'out') {
 		var time = new Date();
-		$('#streaming #player').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #thumbnail').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+		$('#streaming #player').html('<div id="mediaplayer"><script type="text/javascript" src="js/jwplayer.js"></script></div>');
 		}  
 	})
 });
@@ -228,7 +227,7 @@ $('#home #recording_but').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	browser = 1;
-	gen_browser(rec_path,browser,"Recordings","rec");
+	gen_browser("./",browser,"Recordings","rec");
 	return false;
 });
 
@@ -250,7 +249,7 @@ $('#home #video_but').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	browser = 1;
-	gen_browser(video_path,browser,"Videos","vid");
+	gen_browser("./",browser,"Videos","vid");
 	return false;
 });
 
@@ -258,7 +257,7 @@ $('#home #audio_but').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	browser = 1;
-	gen_browser(audio_path,browser,"Audio","aud");
+	gen_browser("./",browser,"Audio","aud");
 	return false;
 });
 
@@ -395,9 +394,9 @@ $('#streamchannel span.streamButton a').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	var type = stream_channel.find('span[rel="type"]').text();
-    var url = stream_channel.find('span[rel="url"]').text();
-    var mode = $(this).attr('id');
-    start_broadcast(type,url,mode);
+	var url = stream_channel.find('span[rel="url"]').text();
+	var mode = $(this).attr('id');
+	start_broadcast(type,url,mode);
 	return false;
 });
 $('#streamchannel span.recButton a').tap(function(event) {
@@ -407,7 +406,7 @@ $('#streamchannel span.recButton a').tap(function(event) {
 	var id = "new";
 	var active= 1;
 	var name = stream_channel.find('span[class="name_now"]').text();
-	name = name.substr(4,name.length);
+	name = name.substr(5,name.length);
 	var channumber = stream_channel.find('span[rel="number"]').text();
 	var channame = stream_channel.find('span[rel="channame"]').text();
 	date = new Date();
@@ -420,7 +419,7 @@ $('#streamchannel span.recButton a').tap(function(event) {
 	var epgtime = stream_channel.find('span[class="epgtime_now"]').text();
 	var starttime = epgtime.substr(0,2) + epgtime.substr(3,2);
 	var endtime  = epgtime.substr(6,2) + epgtime.substr(9,2);
-    gen_edittimer(id,name,active,channumber,channame,rec_date,starttime,endtime);
+	gen_edittimer(id,name,active,channumber,channame,rec_date,starttime,endtime);
 	return false;
 });
 
@@ -429,9 +428,9 @@ $('#streamrec span.streamButton a').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	var type = stream_rec.find('span[rel="type"]').text();
-    var url = stream_rec.find('span[rel="url"]').text();
-    var mode = $(this).attr('id');
-    start_broadcast(type,url,mode);
+	var url = stream_rec.find('span[rel="url"]').text();
+	var mode = $(this).attr('id');
+	start_broadcast(type,url,mode);
 	return false;
 });
 $('#streamvid span.streamButton a').tap(function(event) {
@@ -439,9 +438,9 @@ $('#streamvid span.streamButton a').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
 	var type = stream_vid.find('span[rel="type"]').text();
-    var url = stream_vid.find('span[rel="url"]').text();
-    var mode = $(this).attr('id');
-    start_broadcast(type,url,mode);
+	var url = stream_vid.find('span[rel="url"]').text();
+	var mode = $(this).attr('id');
+	start_broadcast(type,url,mode);
 	return false;
 });
 $('#streaming span.streamButton a[rel="stopbroadcast"]').tap(function(event) {
@@ -467,7 +466,7 @@ function gen_streamchannel(channame,channumber) {
 			stream_channel.find('span[class="desc_now"]').html( program.now_desc );
 			stream_channel.find('span[class="name_next"]').html( 'Next: ' + program.next_title );
 			stream_channel.find('span[class="epgtime_next"]').html( program.next_time );
-			stream_channel.find('span[rel="url"]').html(streamdev_server + channame);
+			stream_channel.find('span[rel="url"]').html(channame);
             stream_channel.find('span[rel="type"]').html('tv');
 			stream_channel.find('span[rel="number"]').html(channumber);
 			stream_channel.find('span[rel="channame"]').html(channame);
@@ -531,7 +530,7 @@ function gen_streaming(session) {
 			if (stream.type == "tv") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/tv.png" onerror="this.src=\'img/nologoTV.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '90px');
+				streaming.find('#thumbnail').css('width', '90px');
 				var streaminfo = '<li><span class="name_now">Now: ' + stream.now_title + '</span>';
 				streaminfo += '<span class="epgtime_now">' + stream.now_time + '</span>';
 				streaminfo += '<span class="desc_now">' + stream.now_desc + '</span></li>';
@@ -542,7 +541,7 @@ function gen_streaming(session) {
 			else if (stream.type == "rec") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/record.png" onerror="this.src=\'img/nologoREC.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '90px');
+				streaming.find('$thumbnail').css('width', '90px');
 				var streaminfo = '<li><span class="name_now">' + stream.name + '</span>';
 				streaminfo += '<span class="epgtime_now">Recorded: ' + stream.recorded + '</span>';
 				streaminfo += '<span class="desc_now">' + stream.desc + '</span></li>';
@@ -551,7 +550,7 @@ function gen_streaming(session) {
 			else if (stream.type == "vid") 
 				{
 				streaming.find('h1').html('<img class="menuicon" src="img/video.png" onerror="this.src=\'img/nologoMEDIA.png\'" /> ' + stream.name );
-				streaming.find('#player').css('width', '190px');
+				streaming.find('#thumbnail').css('width', '190px');
 				var streaminfo = '<li><span class="name_now">' + stream.name + '</span>';
 				streaminfo += '<span class="epgtime_now">Duration: ' + stream.duration + '</span>';
 				desc='<b>format: </b>' + stream.format + '<br><b>video: </b>' + stream.video + '<br><b>audio: </b>' + stream.audio + '<br><b>resolution: </b>' + stream.resolution;
@@ -602,12 +601,38 @@ function playvideo(session,name) {
 		var thumbwidth = streaming.find('span[rel="thumbwidth"]').text();
 		var thumbheight = streaming.find('span[rel="thumbheight"]').text();
 		streaming.find('ul[class="streamstatus"]').find('span[class="mode"]').html(message);
-		if ( status == "ready" || status == "error" ) {
-		streaming.find('#player').removeAttr("style");	
-		streaming.find('#player').html('<video id="videofeed" src="' + url + '" controls autoplay ></video><span rel="ready"></span>');
+		if ( status == "ready" ) {
+
+			$('#streaming #thumbnail').html('');
+
+			playerWidth=window.innerWidth/2;
+			playerHeight=(playerWidth*480)/640;
+			
+			if (debugadaptive)
+				jwplayer("mediaplayer").setup({
+					width: playerWidth,height: playerHeight,
+					autostart: 'true',
+					plugins: { 'swf/qualitymonitor.swf' : {} },
+					modes: [
+						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/adaptiveProvider.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
+						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
+					]});
+			else
+				jwplayer("mediaplayer").setup({
+					width: playerWidth,height: playerHeight,
+					modes: [
+						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/adaptiveProvider.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
+						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
+					]});
 
 			return false;
-			}
+		}
+		else
+		{
+	                var time = new Date();
+        	        $('#streaming #thumbnail').html('<img class="thumbnail" id="thumbnail" src="ram/sessions/session' + session + '/thumb.png" onerror="this.src=\'img/nologoMEDIA.png\'"></img>');
+			$('#streaming #player').html('<div id="mediaplayer"><script type="text/javascript" src="js/jwplayer.js"></script></div>');
+		}
 		prevmsg = message;
 		status_Start(session,prevmsg);
 	}
@@ -638,24 +663,15 @@ $('ul[rel="filelist"] li[class="arrow"] a').tap(function(event) {
 	}
 	var browser = $(this).parents('div').find('span[rel="currentbrowser"]').html();
 	var foldertype = $('#browser'+browser+' span[rel="foldertype"]').html();
-	var path = $('#browser'+browser+' span[rel="path"]').text();
 	browser = parseInt(browser);
 	browser++;
+	var path = $(this).find('span[class=filepath]').attr('rel');
 	if ( type == "folder" ) 
-		{
-		newpath=path+name+'/';
-		gen_browser(newpath,browser,name,foldertype);
-		}
+		gen_browser(path,browser,name,foldertype);
 	else if ( type == "rec" )
-		{
-		var path = $(this).find('span[class=filepath]').attr('rel');
 		gen_streamrec(name,path);
-		}
 	else if ( type == "video" )
-		{
-		var path = $(this).find('span[class=filepath]').attr('rel');
 		gen_streamvid(name,path);
-		}
 	return false;
 });
 
@@ -668,7 +684,7 @@ $('div[rel="browser"] a[class="back"]').tap(function(event) {
 });
 
 //Generate browser div according to type
-function gen_browser(path,browser,name,foldertype) {
+function gen_browser(path, browser,name,foldertype) {
 	browser_template = '<div class="toolbar"></div>';
 	browser_template += '<ul rel="filelist" class="rounded"></ul>';
 	browser_template += '<div rel="dataholder" style="visibility:hidden">'
@@ -678,34 +694,23 @@ function gen_browser(path,browser,name,foldertype) {
 	browser_template += '</div>';
 	$('#jqt').append('<div id="browser' + browser + '" rel="browser"></div>'),
 	$('#browser'+browser).html(browser_template);
-	if ( path == rec_path || path == video_path || path == audio_path ) {
-		toolbar = '<a href="#" class="back">Home</a>';
-		if ( foldertype == 'rec' ){
-		toolbar += '<h1><img class="menuicon" src="img/record.png" /> ' + name + '</h1>';
-		} 
-		else if ( foldertype == 'vid' ){
-			toolbar += '<h1><img class="menuicon" src="img/video.png" /> ' + name + '</h1>';
-		}
-		else if ( foldertype == 'aud' ){
-			toolbar += '<h1><img class="menuicon" src="img/audio.png" /> ' + name + '</h1>';
-		}
-		$('#browser' + browser + ' div[class="toolbar"]').html(toolbar);
+	toolbar = '';
+	if ( path != "./")
+		toolbar += '<a href="#" class="back">Back</a>';
+
+	toolbar += '<a href="#" class="back">Home</a>';
+	if ( foldertype == 'rec' ){
+	toolbar += '<h1><img class="menuicon" src="img/record.png" /> ' + name + '</h1>';
+	} 
+	else if ( foldertype == 'vid' ){
+		toolbar += '<h1><img class="menuicon" src="img/video.png" /> ' + name + '</h1>';
 	}
-	else {
-		toolbar = '<a href="#" class="back">Back</a>';
-		toolbar += '<a href="#home" id="home_but" class="button">Home</a>';
-		if ( foldertype == 'rec' ){
-			toolbar += '<h1><img class="menuicon" src="img/record.png" /> ' + name + '</h1>';
-		} 
-		else if ( foldertype == 'vid' ){
-			toolbar += '<h1><img class="menuicon" src="img/video.png" /> ' + name + '</h1>';
-		}
-		else if ( foldertype == 'aud' ){
-			toolbar += '<h1><img class="menuicon" src="img/audio.png" /> ' + name + '</h1>';
-		}
-		$('#browser' + browser + ' div[class="toolbar"]').html(toolbar);
+	else if ( foldertype == 'aud' ){
+		toolbar += '<h1><img class="menuicon" src="img/audio.png" /> ' + name + '</h1>';
 	}
-	var dataString = 'action=browseFolder&path='+encodeURIComponent(path);
+	$('#browser' + browser + ' div[class="toolbar"]').html(toolbar);
+
+	var dataString = 'action=browseFolder&path='+encodeURIComponent(path)+'&type='+encodeURIComponent(foldertype);
 	$.getJSON("bin/backend.php",
 	dataString,
 	function(data) {
@@ -714,27 +719,27 @@ function gen_browser(path,browser,name,foldertype) {
 			$("#browser" + browser).find('span[rel="currentbrowser"]').html(browser);
 			$.each(data.list, function(i,list){
 				if ( i > 10 ) {
-				hidetoggle = 'toggle';
+					hidetoggle = 'toggle';
 				}
 				else
 				{
-				hidetoggle = '';
+					hidetoggle = '';
 				}
 				if (list.type == "folder") {
-				$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="folder"><span class="menuname">' + list.name + '</span></a></li>');			
+					$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="folder"><span class="menuname">' + list.name + '</span><span class="filepath" rel="' + list.path + '"></span></a></li>');
 				}
 				else if (list.type == "rec") {
-				$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="rec"><img class="menuicon" src="img/record.png" /><span class="menuname">' + list.name + '</span><span class="filepath" rel="' + list.path + '"></span></a></li>');	
+					$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="rec"><img class="menuicon" src="img/record.png" /><span class="menuname">' + list.name + '</span><span class="filepath" rel="' + list.path + '"></span></a></li>');	
 				}
 				else if ( list.type == "video" ) {
-				$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="video"><img class="menuicon" src="img/video.png" /><span class="menuname">' + list.name + '</span><span class="filepath" rel="' + list.path + '"></span></a></li>');	
+					$("#browser" + browser).find('ul').append('<li class="arrow" rel="' + hidetoggle + '"><a href="#" rel="video"><img class="menuicon" src="img/video.png" /><span class="menuname">' + list.name + '</span><span class="filepath" rel="' + list.path + '"></span></a></li>');	
 				}
 				else if ( list.type == "audio" ) {
 					if ( list.trackname != "" ) {
 					name = list.trackname;
 					} else {
 					name = list.name; }
-				$("#browser" + browser).find('ul').append('<li class="track" rel="' + hidetoggle + '"><a href="javascript:document.player.Play();" onclick="addplayer(this);" rel="audio"><div class="numberbox"><span class="number">' + list.number + '</span></div><span class="tracktitle" rel="'+ list.name + '">' + name + '</span><div class="timebox"><span class="time">' + list.length +'</span></div></a></li>');
+						$("#browser" + browser).find('ul').append('<li class="track" rel="' + hidetoggle + '"><a href="javascript:document.player.Play();" onclick="addplayer(this);" rel="audio"><div class="numberbox"><span class="number">' + list.number + '</span></div><span class="tracktitle" rel="'+ list.name + '">' + name + '</span><div class="timebox"><span class="time">' + list.length +'</span></div></a></li>');
 				}
 			});
 			$('li[rel="toggle"]').hide();
@@ -1061,9 +1066,9 @@ $('#epgdetails span.recButton a').tap(function(event) {
 $('#epgdetails  span.streamButton a').tap(function(event) {
 	event.preventDefault();
 	json_start(this);
-    var url = $("#epgdetails").find('span[rel="url"]').text();
-    var mode = $(this).attr('id');
-    start_broadcast('tv',url,mode);
+	var url = $("#epgdetails").find('span[rel="url"]').text();
+	var mode = $(this).attr('id');
+	start_broadcast('tv',url,mode);
 	return false;
 });
 
@@ -1250,9 +1255,12 @@ function get_epgdetails(channum,startingtime,day) {
 	epg_details.find('div[rel="dataholder"] span[rel="date"]').html(date);
 	epg_details.find('div[rel="dataholder"] span[rel="stime"]').html(stime);
 	epg_details.find('div[rel="dataholder"] span[rel="etime"]').html(etime);
-	epg_details.find('div[rel="dataholder"] span[rel="url"]').html(streamdev_server + channum);
+	epg_details.find('div[rel="dataholder"] span[rel="url"]').html(channame);
 	if ( running == "yes" ) {
-		epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="dissolve"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="dissolve">Wifi</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');		
+		if ( adaptive )
+	                epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="adaptive" href="#" class="dissolve">Start streaming</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
+                else
+                        epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="dissolve"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="dissolve">Wifi</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
 	} else {
 		epg_details.find('#epgdetails_buttons').html('<span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
 	}
