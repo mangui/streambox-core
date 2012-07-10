@@ -144,8 +144,8 @@ fi
 > ./segmenter.pid
 for segid in `seq 1 $NBQUALITIES`
 do
-	# Now start segmenter1
-	$SEGMENTERPATH ./fifo${segid} $SEGDUR `get_stream_name $segid` `get_stream_name $segid`.m3u8 "" $SEGWIN &
+	# Now start segmenter
+	$SEGMENTERPATH -i ./fifo${segid} -d $SEGDUR -o `get_stream_name $segid` -x `get_stream_name $segid`.m3u8 -w $SEGWIN &
 
 	sleep 0.5
 
