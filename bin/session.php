@@ -274,7 +274,7 @@ function sessiondeletesingle($session)
 
 function getstreamingstatus($session)
 {
-	global $maxencodingprocesses, $httppath;
+	global $maxencodingprocesses, $httppath, $adaptive;
 
 	$status = array();
 
@@ -291,7 +291,9 @@ function getstreamingstatus($session)
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-		if (count(glob($path . '/*.ts')) == 0) /* */
+    /* it is better to check for playlist availability as they are created after first complete ts fragment is available
+       in case of adaptive streaming, 1 playlist is created automatically */
+		if (count(glob($path . '/*.m3u8')) <= $adaptive)
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
